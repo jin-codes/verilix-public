@@ -1,41 +1,43 @@
 # verilix
 
-**MCP로 연결된 AI(ChatGPT · Claude · Gemini)와의 대화를 구조화된 문서로 쌓아, 다음 대화를 더 깊게 만드는 개인 지식 베이스.**
+**English** · [한국어](README.ko.md)
 
-> 이미 쓰고 있는 AI 도구에 그대로 연결됩니다. 대화의 결론이 문서로 남고, 그 문서들이 쌓여 다음 대화의 컨텍스트가 됩니다.
+**A personal knowledge base that plugs into the AI tools you already use (ChatGPT · Claude · Gemini) via MCP — turning your conversations into structured documents that make the next conversation deeper.**
 
-*A personal knowledge base that plugs into the AI tools you already use via MCP. Conversations become structured documents, and those documents become context for the next conversation.*
+> Connect the AI you already use. The conclusions of your conversations are saved as documents, and those documents build up into context for the next one.
 
-## 스크린샷
-![랜딩 — 지식 그래프가 마우스에 반응하는 히어로](docs/screenshots/landing-hero.webp)
+**Live site**: https://verilix.vercel.app · **Demo (fictional data)**: https://verilix.vercel.app/en/demo/notes
 
-| 랜딩 — 라이브러리 소개 | 지식 지도 |
+## Screenshots
+![Landing page — hero with a knowledge graph that reacts to the mouse](docs/screenshots/landing-hero.webp)
+
+| Landing — library overview | Knowledge map |
 |---|---|
-| ![랜딩의 기능 카드 섹션](docs/screenshots/landing-library.webp) | ![카테고리·문서를 방사형으로 보여주는 지식 지도](docs/screenshots/knowledge-map.webp) |
+| ![Feature cards on the landing page](docs/screenshots/landing-library.webp) | ![Knowledge map showing categories and documents radially](docs/screenshots/knowledge-map.webp) |
 
-## 주요 기능
-- **MCP 서버** — 12개 툴(검색·저장·편집·삭제/복구·버전 이력·링크·카테고리·폴더). OAuth(PKCE + 동의 화면) 또는 API 키로 연결
-- **git 방식 문서 버전 관리** — 수정/삭제 전 상태를 커밋 메시지와 함께 스냅샷, 소프트 삭제 + 롤백
-- **하이브리드 검색** — 의미 검색(pgvector) + 단어 검색(tsvector/부분 문자열)
-- **지식 지도** — 카테고리 · 문서 · 관련 문서 링크를 방사형으로 시각화
-- **주간 다이제스트** — 관심사 변화(서버가 계산)와 기존 문서와의 모순을 요약해 메일 발송
-- 다크모드, 한/영 다국어, 모바일 반응형
+## Features
+- **MCP server** — 12 tools (search, save, edit, delete/restore, version history, link, categories, folders). Connect with OAuth (PKCE + consent screen) or an API key
+- **Git-style document versioning** — every edit or delete snapshots the previous state with a commit message; deletes are soft, and any version can be restored
+- **Hybrid search** — semantic search (pgvector) plus word search (tsvector / substring)
+- **Knowledge map** — categories, documents, and links between related documents drawn as a radial graph
+- **Weekly digest** — an email summarizing interest shifts (computed on the server) and contradictions with existing notes
+- Dark mode, Korean/English, responsive on mobile
 
-## 기술 스택
+## Tech stack
 Next.js (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Postgres, pgvector, RLS, Auth) · Anthropic API · Gemini Embeddings · Vercel
 
-## 설계 포인트
-- **RLS 중심 보안**: 모든 테이블 RLS, 서비스 롤은 서버 전용 + 소유자 검증 후에만 사용. 권한 컬럼은 트리거로 보호, `security definer` 함수는 명시적 권한 회수. 자세한 원칙은 [CLAUDE.md](CLAUDE.md)의 "보안 모델" 참고
-- **OAuth 자체 구현**: RFC 7591(DCR) / 8414 / 9728 / PKCE, 동의 화면 + CSRF·clickjacking·XSS 방어, 코드·리프레시 토큰 단일 사용 보장
-- **서버 결정론 + LLM 서술 분리**: 다이제스트의 트렌드는 스냅샷 diff로 서버가 계산하고, LLM은 설명만 작성
+## Design highlights
+- **RLS-first security**: RLS on every table; the service role is server-only and used only after ownership checks. Privileged columns are protected by a trigger, and `security definer` functions have their execute rights explicitly revoked. See the "보안 모델" (security model) section of [CLAUDE.md](CLAUDE.md) (written in Korean)
+- **Hand-built OAuth**: RFC 7591 (DCR) / 8414 / 9728 / PKCE, a consent screen with CSRF, clickjacking and XSS defenses, and single-use guarantees for authorization codes and refresh tokens
+- **Deterministic server, LLM only narrates**: digest trends are computed by the server from snapshot diffs; the LLM only writes the explanation
 
-## 실행
+## Getting started
 ```bash
-cp .env.example .env.local   # 값 채우기
+cp .env.example .env.local   # fill in the values
 npm install
 npm run dev
 ```
-Supabase 프로젝트에 `supabase/migrations/`를 순서대로 적용해야 합니다.
+Apply `supabase/migrations/` to your Supabase project in order.
 
-## 라이선스
-라이선스를 지정하지 않았습니다. 포트폴리오 열람 목적으로 공개한 저장소이며, 별도 허락 없이 복제·재배포·상업적 이용을 할 수 없습니다(All rights reserved).
+## License
+No license is granted. This repository is public for portfolio viewing only; copying, redistribution, and commercial use are not permitted without permission (all rights reserved).
