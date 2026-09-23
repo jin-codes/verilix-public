@@ -1,0 +1,1155 @@
+<!doctype html>
+<html lang="ko" data-theme>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>verilix — 지식 베이스</title>
+<meta name="description" content="verilix는 이미 쓰는 AI 도구에 연결되어, 그 대화를 구조화된 문서로 정리하고 쌓아 다음 대화를 더 깊게 만듭니다." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet" />
+<script>
+  // FOUC guard for the manual theme override.
+  try {
+    var t = localStorage.getItem('verilix-demo-theme');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --paper: #FAF9F6;
+    --paper-raised: #FCFBF9;
+    --ink: #1A1A18;
+    --ink-soft: #5A5A56;
+    --ink-mute: #9A9A96;
+    --line: #E0DDD6;
+    --line-strong: #C8C5BC;
+    --green: #1A3D2B;
+    --green-light: #2E5C3E;
+    --burgundy: #522B2D;
+    --sage: #6C7B70;
+    --sidebar: #EDEAE3;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+    --serif: 'Fraunces', 'Nanum Myeongjo', Georgia, 'Times New Roman', serif;
+    --sans: 'Inter', 'Apple SD Gothic Neo', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', Helvetica, Arial, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  :root:not([data-theme="light"]) {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #171613;
+      --paper-raised: #221F1B;
+      --ink: #EEEBE4;
+      --ink-soft: #A6A29A;
+      --ink-mute: #726E67;
+      --line: #34322D;
+      --line-strong: #47443D;
+      --green: #3E7A57;
+      --green-light: #6FAE86;
+      --burgundy: #8B4A4C;
+      --sage: #8FA79A;
+      --sidebar: #100F0D;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.45);
+      --shadow-lg: 0 10px 30px rgba(0,0,0,0.55);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #171613;
+    --paper-raised: #221F1B;
+    --ink: #EEEBE4;
+    --ink-soft: #A6A29A;
+    --ink-mute: #726E67;
+    --line: #34322D;
+    --line-strong: #47443D;
+    --green: #3E7A57;
+    --green-light: #6FAE86;
+    --burgundy: #8B4A4C;
+    --sage: #8FA79A;
+    --sidebar: #100F0D;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.45);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.55);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /* subtle paper grain */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+  :root[data-theme="dark"] body::before,
+  :root:not([data-theme="light"]) body::before { opacity: 0.9; }
+
+  main, header, footer { position: relative; z-index: 1; }
+
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: rgba(46, 92, 62, 0.65); color: #fff; }
+
+  .wrap { width: min(1120px, 100% - 48px); margin-inline: auto; }
+
+  /* ---------- scroll progress ---------- */
+  .progress {
+    position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+    background: var(--green); z-index: 100; transition: width .1s linear;
+  }
+
+  /* ---------- nav ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 60;
+    background: color-mix(in srgb, var(--paper) 80%, transparent);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s ease, background-color .2s ease;
+  }
+  header.nav.scrolled { border-bottom-color: var(--line); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand svg { display: block; height: 20px; width: auto; color: var(--ink); }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a.link {
+    font-size: 13px; color: var(--ink-soft); letter-spacing: 0.01em;
+    transition: color .15s ease;
+  }
+  .nav-links a.link:hover { color: var(--ink); }
+  .icon-btn {
+    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line); border-radius: 9px; background: transparent;
+    color: var(--ink-soft); cursor: pointer; transition: background-color .15s ease, color .15s ease;
+  }
+  .icon-btn:hover { background: color-mix(in srgb, var(--line) 45%, transparent); color: var(--ink); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer;
+    padding: 9px 16px; border-radius: 999px; border: 1px solid transparent;
+    transition: transform .12s ease, background-color .15s ease, border-color .15s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { background: var(--green-light); }
+  .btn-ghost { border-color: var(--line-strong); color: var(--ink); }
+  .btn-ghost:hover { background: color-mix(in srgb, var(--line) 40%, transparent); }
+  .btn-lg { font-size: 15px; padding: 13px 24px; }
+
+  @media (max-width: 760px) { .nav-links a.link { display: none; } }
+
+  /* ---------- section scaffold ---------- */
+  section { scroll-margin-top: 88px; }
+  .section { padding-block: clamp(72px, 13vh, 148px); }
+  .section + .section { border-top: 1px solid var(--line); }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--sage);
+  }
+  .eyebrow::before {
+    content: ""; width: 26px; height: 1px; background: var(--line-strong);
+  }
+
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: -0.015em; margin: 0; word-break: keep-all; }
+  h1 em, h2 em { font-style: italic; font-weight: 600; color: var(--green-light); white-space: nowrap; }
+
+  .h-sec { font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.12; margin-top: 20px; }
+  .lead {
+    max-width: 60ch; margin-top: 20px; font-size: 1.08rem; line-height: 1.7; color: var(--ink-soft);
+  }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .mindmap-pulse { animation: none; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero { padding-top: clamp(64px, 12vh, 120px); padding-bottom: clamp(72px, 13vh, 140px); position: relative; overflow: clip; }
+  .hero::after {
+    content: ""; position: absolute; z-index: -1; inset: -10% -20% auto -20%; height: 520px;
+    background: radial-gradient(60% 60% at 22% 30%, color-mix(in srgb, var(--green) 12%, transparent), transparent 70%),
+                radial-gradient(50% 50% at 82% 12%, color-mix(in srgb, var(--burgundy) 9%, transparent), transparent 70%);
+    filter: blur(8px);
+  }
+  .hero h1 {
+    font-size: clamp(2.8rem, 6.6vw, 5rem);
+    line-height: 1.03;
+    margin-top: 26px;
+    max-width: 16ch;
+  }
+  .hero .lead { font-size: 1.18rem; color: var(--ink-soft); max-width: 54ch; margin-top: 26px; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+  .hero-note {
+    margin-top: 26px; font-size: 0.9rem; color: var(--ink-mute);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-note svg { flex-shrink: 0; color: var(--sage); }
+
+  /* ---------- loop ---------- */
+  .loop-steps {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;
+    margin-top: 56px; position: relative;
+  }
+  .loop-steps::before {
+    content: ""; position: absolute; top: 26px; left: 7%; right: 7%; height: 1px;
+    background: repeating-linear-gradient(90deg, var(--line-strong) 0 6px, transparent 6px 12px);
+  }
+  .loop-step { position: relative; }
+  .loop-step .num {
+    font-family: var(--serif); font-size: 2.6rem; line-height: 1; font-weight: 500;
+    color: var(--ink); opacity: 0.16; position: relative;
+  }
+  .loop-step .dot {
+    position: absolute; top: 21px; left: 0; width: 11px; height: 11px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 0 4px var(--paper);
+  }
+  .loop-step h3 { font-family: var(--sans); font-weight: 600; font-size: 1rem; margin-top: 20px; letter-spacing: 0; color: var(--ink); }
+  .loop-step p { margin: 8px 0 0; font-size: 0.9rem; color: var(--ink-soft); line-height: 1.65; }
+  .loop-back {
+    margin-top: 24px; text-align: right; font-size: 0.82rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--sage);
+  }
+  @media (max-width: 880px) {
+    .loop-steps { grid-template-columns: 1fr; gap: 26px; padding-left: 26px; border-left: 1px solid var(--line-strong); }
+    .loop-steps::before { display: none; }
+    .loop-step .dot { left: -32px; top: 12px; }
+    .loop-back { text-align: left; }
+  }
+
+  /* ---------- generic two-column ---------- */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; margin-top: 52px; }
+  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; gap: 40px; } }
+
+  .badge-free {
+    display: inline-block; margin-left: 12px; vertical-align: middle;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--green-light); border: 1px solid color-mix(in srgb, var(--green) 45%, var(--line));
+    border-radius: 999px; padding: 3px 9px;
+  }
+
+  .tool { padding: 22px 0; border-top: 1px solid var(--line); }
+  .tool:first-child { border-top: 0; padding-top: 0; }
+  .tool code {
+    font-family: var(--mono); font-size: 0.82rem; color: var(--green-light);
+    background: color-mix(in srgb, var(--green) 8%, transparent); padding: 3px 8px; border-radius: 6px;
+  }
+  .tool p { margin: 12px 0 0; font-size: 0.92rem; color: var(--ink-soft); }
+
+  /* terminal */
+  .term {
+    border: 1px solid var(--line-strong); border-radius: 14px; overflow: hidden;
+    background: var(--paper-raised); box-shadow: var(--shadow-sm);
+  }
+  .term-bar { display: flex; align-items: center; gap: 7px; padding: 13px 15px; border-bottom: 1px solid var(--line); }
+  .term-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
+  .term-bar span { margin-left: 8px; font-family: var(--mono); font-size: 11px; color: var(--ink-mute); }
+  .term-body { padding: 18px 20px; font-family: var(--mono); font-size: 13px; line-height: 2; color: var(--ink-soft); }
+  .term-body .row + .row { margin-top: 6px; }
+  .term-body .p { color: var(--green-light); }
+  .term-body .arg { color: var(--ink-mute); }
+  .term-body .ok { color: var(--green-light); }
+  .term-body .muted { color: var(--ink-mute); }
+
+  .note-line {
+    margin-top: 22px; font-size: 0.86rem; color: var(--ink-mute);
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .note-line svg { flex-shrink: 0; margin-top: 3px; color: var(--sage); }
+
+  /* ---------- feature chips ---------- */
+  .feat-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
+  .feat-grid span {
+    font-size: 0.82rem; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; background: var(--paper-raised);
+  }
+
+  /* ---------- product frame ---------- */
+  .frame {
+    margin-top: 48px; border: 1px solid var(--line-strong); border-radius: 16px; overflow: hidden;
+    background: var(--paper); box-shadow: var(--shadow-lg);
+  }
+  .frame-bar {
+    display: flex; align-items: center; gap: 7px; padding: 12px 16px;
+    border-bottom: 1px solid var(--line); background: var(--paper-raised);
+  }
+  .frame-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
+  .frame-bar span { margin-left: 10px; font-size: 12px; color: var(--ink-mute); }
+  .frame-body { display: flex; min-height: 460px; }
+
+  .pf-side {
+    width: 210px; flex-shrink: 0; background: var(--sidebar);
+    border-right: 1px solid var(--line-strong); display: flex; flex-direction: column;
+    font-size: 13px; user-select: none;
+  }
+  .pf-tabs { display: flex; gap: 6px; padding: 10px; border-bottom: 1px solid var(--line-strong); }
+  .pf-tab {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    height: 32px; border-radius: 9px; color: var(--ink-soft); font-size: 12.5px;
+  }
+  .pf-tab.active {
+    background: var(--paper-raised); border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm); color: var(--ink); font-weight: 500;
+  }
+  .pf-search { margin: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; color: var(--ink-mute); font-size: 12px; background: var(--paper); }
+  .pf-chips { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 10px 10px; border-bottom: 1px solid var(--line-strong); }
+  .pf-chips b {
+    font-size: 11px; font-weight: 400; padding: 3px 9px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--ink-soft); background: var(--paper);
+  }
+  .pf-chips b.on { background: var(--green); color: #fff; border-color: var(--green); }
+  .pf-list { flex: 1; overflow: hidden; padding: 8px; }
+  .pf-list .it { display: flex; gap: 8px; padding: 8px 9px; border-radius: 8px; color: var(--ink-soft); }
+  .pf-list .it svg { flex-shrink: 0; margin-top: 2px; color: var(--sage); }
+  .pf-list .it .t { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .pf-list .it small { display: block; font-size: 10px; color: var(--ink-mute); }
+  .pf-foot { display: flex; align-items: center; gap: 8px; padding: 10px; border-top: 1px solid var(--line-strong); }
+  .pf-foot .av { width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+
+  .pf-main { flex: 1; display: flex; flex-direction: column; }
+  .pf-head { height: 48px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--line); font-size: 13px; font-weight: 600; }
+  .mindmap-outer { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .mindmap-inner { position: relative; width: min(100%, 480px); aspect-ratio: 1 / 1; }
+  .mindmap-inner svg.graph { width: 100%; height: 100%; overflow: visible; display: block; }
+  .cat-group, .doc-group { transition: opacity 300ms ease; }
+  .cat-group text { pointer-events: none; }
+  .doc-group { cursor: pointer; }
+  @keyframes mindmap-pulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.35); }
+  }
+  .mindmap-pulse { animation: mindmap-pulse 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+  .popover {
+    position: absolute; z-index: 20; width: 244px; padding: 14px; border-radius: 12px;
+    background: var(--paper-raised); border: 1px solid var(--line-strong); box-shadow: var(--shadow-lg);
+  }
+  .popover .pv-title { font-family: var(--serif); font-size: 14px; font-weight: 600; line-height: 1.35; }
+  .popover .pv-summary {
+    margin-top: 7px; font-size: 12px; line-height: 1.55; color: var(--ink-soft);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .popover .pv-foot { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .popover .pv-date { font-size: 10px; color: var(--ink-mute); }
+  .popover .pv-open {
+    display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500;
+    padding: 5px 11px; border-radius: 7px; border: 0; cursor: pointer; background: var(--green); color: #fff; font-family: var(--sans);
+  }
+  @media (max-width: 720px) { .pf-side { display: none; } }
+
+  /* ---------- document card ---------- */
+  .doc-card { border: 1px solid var(--line); border-radius: 16px; background: var(--paper-raised); padding: 26px; box-shadow: var(--shadow-sm); }
+  .doc-card .dc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+  .doc-card h3 { font-size: 1.4rem; line-height: 1.25; }
+  .badge-warn {
+    flex-shrink: 0; color: #fff; background: var(--burgundy); border-radius: 999px;
+    padding: 4px 11px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.03em; white-space: nowrap;
+  }
+  .dc-meta { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12px; color: var(--ink-mute); }
+  .dc-meta .type { border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px 9px; color: var(--ink-soft); }
+  .dc-block { margin-top: 20px; }
+  .dc-block .k {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sage);
+  }
+  .dc-block p { margin: 7px 0 0; font-size: 0.92rem; color: var(--ink); line-height: 1.65; }
+  .dc-rule { height: 1px; background: var(--line); margin-top: 20px; }
+  .dc-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
+  .dc-tags b { font-weight: 400; font-size: 11px; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; }
+  .dc-related { margin-top: 18px; }
+  .dc-related a { display: flex; align-items: center; gap: 8px; font-size: 0.86rem; color: var(--ink-soft); padding: 5px 0; }
+  .dc-related a svg { color: var(--sage); flex-shrink: 0; }
+
+  /* ---------- personalization ---------- */
+  .learn { border: 1px solid var(--line); border-radius: 16px; background: var(--paper-raised); overflow: hidden; }
+  .learn-row { display: grid; grid-template-columns: 190px 1fr; gap: 18px; padding: 16px 22px; border-top: 1px solid var(--line); align-items: baseline; }
+  .learn-row:first-child { border-top: 0; }
+  .learn-row .topic { font-weight: 600; font-size: 0.92rem; }
+  .learn-row .lvl { margin-left: 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; }
+  .lvl.b { color: var(--sage); border: 1px solid color-mix(in srgb, var(--sage) 50%, var(--line)); }
+  .lvl.i { color: var(--green-light); border: 1px solid color-mix(in srgb, var(--green) 45%, var(--line)); }
+  .lvl.a { color: #fff; background: var(--green); }
+  .learn-row .obs { font-size: 0.88rem; color: var(--ink-soft); }
+  @media (max-width: 620px) { .learn-row { grid-template-columns: 1fr; gap: 6px; } }
+
+  /* ---------- digest / email ---------- */
+  .mail { border: 1px solid var(--line-strong); border-radius: 18px; overflow: hidden; background: var(--paper-raised); box-shadow: var(--shadow-md); }
+  .mail-head { display: flex; align-items: center; gap: 10px; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+  .mail-head svg { color: var(--ink); }
+  .mail-head .subj { font-weight: 600; font-size: 0.92rem; }
+  .mail-head .when { margin-left: auto; font-size: 11px; color: var(--ink-mute); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; }
+  .mail-body { padding: 22px; }
+  .mail-body .intro { margin: 0 0 4px; font-size: 0.92rem; color: var(--ink-soft); line-height: 1.7; }
+  .mail-body h4 {
+    margin: 24px 0 10px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--sage);
+  }
+  .mail-item { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 7px 0; font-size: 0.9rem; border-top: 1px dashed var(--line); }
+  .mail-item:first-of-type { border-top: 0; }
+  .mail-item .d { font-size: 11px; color: var(--ink-mute); flex-shrink: 0; }
+  .trend { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 0.9rem; }
+  .trend .tag { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+  .trend .up { color: var(--green-light); }
+  .trend .down { color: var(--sage); }
+  .trend .new { color: var(--burgundy); }
+  .mail-contra { margin-top: 6px; padding: 12px 14px; border-left: 3px solid var(--burgundy); background: color-mix(in srgb, var(--burgundy) 6%, transparent); border-radius: 0 8px 8px 0; font-size: 0.88rem; color: var(--ink-soft); }
+
+  /* ---------- closing ---------- */
+  .closing { text-align: center; }
+  .closing h2 { font-size: clamp(2rem, 4.4vw, 3.2rem); line-height: 1.1; }
+  .closing .lead { margin-inline: auto; }
+  .closing .hero-cta { justify-content: center; }
+
+  /* ---------- footer ---------- */
+  footer.foot { border-top: 1px solid var(--line); padding-block: 40px; }
+  .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .foot-inner .brand svg { height: 18px; }
+  .foot-inner p { margin: 0; font-size: 0.82rem; color: var(--ink-mute); }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="verilix">
+      <svg viewBox="8 4 296 92" role="img" aria-label="verilix">
+        <line x1="49" y1="51" x2="45" y2="19" stroke="currentColor" stroke-width="5" />
+        <line x1="49" y1="51" x2="83" y2="58" stroke="currentColor" stroke-width="5" />
+        <line x1="49" y1="51" x2="27" y2="80" stroke="currentColor" stroke-width="5" />
+        <circle cx="45" cy="19" r="7.5" fill="var(--paper)" stroke="currentColor" stroke-width="5" />
+        <circle cx="83" cy="58" r="11" fill="var(--paper)" stroke="currentColor" stroke-width="5" />
+        <circle cx="27" cy="80" r="9" fill="var(--paper)" stroke="currentColor" stroke-width="5" />
+        <circle cx="49" cy="51" r="17" fill="var(--tertiary, #522B2D)" />
+        <text x="122" y="66" font-family="Fraunces, Georgia, serif" font-size="58" font-weight="600" letter-spacing="-1" fill="currentColor">verilix</text>
+      </svg>
+    </a>
+    <nav class="nav-links">
+      <a class="link" href="#loop">순환</a>
+      <a class="link" href="#mcp">연결</a>
+      <a class="link" href="#kb">지식 베이스</a>
+      <a class="link" href="#digest">다이제스트</a>
+      <button class="icon-btn" id="themeBtn" aria-label="테마 전환" title="테마 전환"></button>
+      <a class="btn btn-primary" href="#start">시작하기</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero wrap">
+    <div class="reveal in">
+      <span class="eyebrow">AI 지식 파트너</span>
+      <h1>대화는 흩어져도, <em>지식은</em> 남습니다</h1>
+      <p class="lead">verilix는 당신이 이미 쓰는 대화형 AI에 연결됩니다. 거기서 나눈 대화는 구조화된 문서로 정리되어 쌓이고, 그 축적이 다음 대화를 한층 더 깊게 만듭니다.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#start">무료로 시작하기</a>
+        <a class="btn btn-ghost btn-lg" href="#mcp">연결 방법 보기</a>
+      </div>
+      <p class="hero-note">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        verilix 안에 별도의 채팅창은 없습니다. 대화는 늘 쓰던 그 도구에서 그대로.
+      </p>
+    </div>
+  </section>
+
+  <!-- LOOP -->
+  <section id="loop" class="section wrap">
+    <div class="reveal">
+      <span class="eyebrow">01 · 순환</span>
+      <h2 class="h-sec">쌓일수록 깊어지는 <em>고리</em></h2>
+      <p class="lead">한 번의 대화로 끝나지 않습니다. 나눈 이야기가 다음 대화의 밑거름이 되는 순환이 계속 돕니다.</p>
+    </div>
+    <div class="loop-steps reveal">
+      <div class="loop-step">
+        <div class="num">01</div><span class="dot"></span>
+        <h3>연결된 AI 도구에서 대화</h3>
+        <p>평소 쓰던 대화형 AI에서, 형식 갖추지 않고 편하게 묻고 이야기합니다.</p>
+      </div>
+      <div class="loop-step">
+        <div class="num">02</div><span class="dot"></span>
+        <h3>구조화된 문서로 자동 정리</h3>
+        <p>주제가 무르익으면 제목·요약·결론·배운 점·태그가 담긴 문서로 알아서 정리됩니다.</p>
+      </div>
+      <div class="loop-step">
+        <div class="num">03</div><span class="dot"></span>
+        <h3>지식 베이스에 축적</h3>
+        <p>정리된 문서가 흩어지지 않고 태그 트리와 함께 차곡차곡 쌓입니다.</p>
+      </div>
+      <div class="loop-step">
+        <div class="num">04</div><span class="dot"></span>
+        <h3>다음 대화에 관련 문서만 주입</h3>
+        <p>새 대화를 시작하면 지금 주제와 맞닿은 문서만 골라 조용히 컨텍스트로 넣어줍니다.</p>
+      </div>
+    </div>
+    <div class="loop-back reveal">↺ 그리고 다시 반복</div>
+  </section>
+
+  <!-- MCP -->
+  <section id="mcp" class="section wrap">
+    <div class="reveal">
+      <span class="eyebrow">02 · 연결</span>
+      <h2 class="h-sec">늘 쓰던 AI 도구에서, 그대로<span class="badge-free">무료</span></h2>
+      <p class="lead">verilix의 지식 베이스를 평소 쓰는 대화형 AI에 연결하세요. 서버 주소 하나면 됩니다. 연결과 사용에 별도 요금은 없습니다.</p>
+    </div>
+    <div class="cols">
+      <div class="reveal">
+        <div class="tool">
+          <code>search_knowledge</code>
+          <p>질문하면 쌓아둔 문서 중 관련된 것을 찾아 답에 활용합니다. 그 주제에서 파악된 당신의 숙련도·관심의 결도 배경으로 함께 전달돼, 답의 깊이와 난이도가 맞춰집니다.</p>
+        </div>
+        <div class="tool">
+          <code>save_document</code>
+          <p>그 자리에서 나눈 대화를 새 문서로 저장합니다. 제목·요약·결론·배운 점·태그까지 정리해서 — 다음에 어디서든 이어볼 수 있게.</p>
+        </div>
+        <p class="note-line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          OAuth를 지원하는 도구는 서버 주소만 붙여넣으면 브라우저 로그인으로 바로 연결됩니다. API 키를 직접 넣는 방식도 지원합니다.
+        </p>
+      </div>
+      <div class="reveal">
+        <div class="term">
+          <div class="term-bar"><i></i><i></i><i></i><span>연결된 AI 도구</span></div>
+          <div class="term-body">
+            <div class="row"><span class="p">›</span> search_knowledge<span class="arg">({ query: "지난번 로드맵 정리 기준" })</span></div>
+            <div class="row"><span class="ok">✓</span> 관련 문서 3건 — <span class="muted">"프로젝트 방향 정리", "우선순위 트레이드오프" …</span></div>
+            <div class="row"><span class="muted">&nbsp;&nbsp;+ 배경: 이 주제에서 사용자 숙련도 = 중급</span></div>
+            <div class="row">&nbsp;</div>
+            <div class="row"><span class="p">›</span> save_document<span class="arg">({ title: "3분기 로드맵 확정", … })</span></div>
+            <div class="row"><span class="ok">✓</span> 새 문서로 저장됨 — <span class="muted">태그 3개 · 요약 · 결론 포함</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KNOWLEDGE BASE -->
+  <section id="kb" class="section wrap">
+    <div class="reveal">
+      <span class="eyebrow">03 · 지식 베이스</span>
+      <h2 class="h-sec">정리된 것을, <em>한눈에</em></h2>
+      <p class="lead">쌓인 문서는 목록으로도, 방사형 지도로도 볼 수 있습니다. 의미 기반 검색과 태그 필터로 원하는 기록을 바로 찾고, 이어지는 문서와 서로 모순되는 대목까지 짚어 줍니다.</p>
+      <div class="feat-grid">
+        <span>자동 문서화</span>
+        <span>태그 트리 · 필터</span>
+        <span>의미 + 단어 검색</span>
+        <span>관련 문서 연결</span>
+        <span>모순 감지</span>
+        <span>원본 대화 보존</span>
+      </div>
+    </div>
+
+    <!-- product frame -->
+    <div class="frame reveal">
+      <div class="frame-bar"><i></i><i></i><i></i><span>verilix — 지식 베이스</span></div>
+      <div class="frame-body">
+        <div class="pf-side">
+          <div class="pf-tabs">
+            <div class="pf-tab">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>
+              MCP
+            </div>
+            <div class="pf-tab active">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
+              지식 베이스
+            </div>
+          </div>
+          <div class="pf-search">문서 검색</div>
+          <div class="pf-chips">
+            <b class="on">전체</b><b>의사결정</b><b>제품</b><b>철학</b><b>학습</b>
+          </div>
+          <div class="pf-list" id="pfList"></div>
+          <div class="pf-foot"><div class="av">나</div></div>
+        </div>
+        <div class="pf-main">
+          <div class="pf-head">지식 베이스</div>
+          <div class="mindmap-outer">
+            <div class="mindmap-inner" id="mindmapInner">
+              <svg class="graph" id="graph" viewBox="0 0 100 100"></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- document card -->
+    <div class="cols">
+      <div class="reveal">
+        <h3 style="font-size:1.5rem;line-height:1.2">대화 한 편이, <em>이렇게</em> 남습니다</h3>
+        <p class="lead" style="font-size:1rem">저장 버튼을 누를 필요 없이 — 주제가 무르익으면 verilix가 알아서 아래 형태로 정리합니다. 요약·결론·배운 점·할 일·태그, 그리고 원본 대화까지.</p>
+      </div>
+      <div class="reveal">
+        <div class="doc-card">
+          <div class="dc-top">
+            <h3>3분기 로드맵 확정</h3>
+            <span class="badge-warn">모순 감지됨</span>
+          </div>
+          <div class="dc-meta"><span>2026 · 8 · 24</span><span class="type">spec</span></div>
+          <div class="dc-block">
+            <div class="k">핵심 요약</div>
+            <p>세 후보 중 두 번째 방향으로 좁혀짐. 근거는 자원 제약과 되돌릴 수 있는 결정이라는 점.</p>
+          </div>
+          <div class="dc-rule"></div>
+          <div class="dc-block">
+            <div class="k">결론</div>
+            <p>다음 단계는 실행 계획 구체화. 2주 뒤 재검토 지점을 잡아 둔다.</p>
+          </div>
+          <div class="dc-rule"></div>
+          <div class="dc-block">
+            <div class="k">배운 점</div>
+            <p>"완전히 정하기 전에 되돌릴 수 있는지부터 본다"는 기준이 이번에도 잘 작동했다.</p>
+          </div>
+          <div class="dc-tags"><b>프로젝트</b><b>의사결정</b><b>다음 단계</b></div>
+          <div class="dc-related">
+            <a href="#kb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg> 우선순위 트레이드오프</a>
+            <a href="#kb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg> 되돌릴 수 있는 결정 vs 없는 결정</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERSONALIZATION -->
+  <section id="personal" class="section wrap">
+    <div class="reveal">
+      <span class="eyebrow">04 · 개인화</span>
+      <h2 class="h-sec">조용히 배우고, <em>조용히</em> 돕습니다</h2>
+      <p class="lead">대화가 쌓이면 verilix는 주제별로 당신의 숙련도와 관심의 결을 정리해 둡니다. 이 배경은 다음 세션에서 답의 눈높이를 맞추는 데에만 쓰입니다.</p>
+    </div>
+    <div class="learn reveal" style="margin-top:44px">
+      <div class="learn-row">
+        <div><span class="topic">시스템 설계</span><span class="lvl i">중급</span></div>
+        <div class="obs">트레이드오프 어휘에 익숙함. 구체적 실패 사례를 예시로 들면 대화가 빨라진다.</div>
+      </div>
+      <div class="learn-row">
+        <div><span class="topic">철학</span><span class="lvl a">고급</span></div>
+        <div class="obs">1차 문헌을 직접 인용함. 입문 설명은 건너뛰고 바로 논점으로.</div>
+      </div>
+      <div class="learn-row">
+        <div><span class="topic">임베딩 검색</span><span class="lvl b">초급</span></div>
+        <div class="obs">개념을 잡아가는 중. 수식보다 비유가 잘 먹힌다.</div>
+      </div>
+    </div>
+    <p class="note-line reveal">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      개인화 메모는 당신을 위한 배경일 뿐, 대화 상대에게 먼저 늘어놓지 않습니다. 물어보면 무엇을 기록하는지 정직하게 답합니다.
+    </p>
+  </section>
+
+  <!-- WEEKLY DIGEST -->
+  <section id="digest" class="section wrap">
+    <div class="reveal">
+      <span class="eyebrow">05 · 주간 다이제스트</span>
+      <h2 class="h-sec">일주일에 한 번, <em>돌아보기</em></h2>
+      <p class="lead">지난 한 주 새로 쌓인 문서와, 관심사가 어디로 움직였는지, 확인이 필요한 모순을 이메일로 정리해 보냅니다.</p>
+    </div>
+    <div class="reveal" style="margin-top:44px;max-width:620px">
+      <div class="mail">
+        <div class="mail-head">
+          <svg width="16" height="16" viewBox="8 4 296 92" aria-hidden="true">
+            <line x1="49" y1="51" x2="45" y2="19" stroke="currentColor" stroke-width="6" />
+            <line x1="49" y1="51" x2="83" y2="58" stroke="currentColor" stroke-width="6" />
+            <line x1="49" y1="51" x2="27" y2="80" stroke="currentColor" stroke-width="6" />
+            <circle cx="45" cy="19" r="8" fill="var(--paper-raised)" stroke="currentColor" stroke-width="6" />
+            <circle cx="83" cy="58" r="11" fill="var(--paper-raised)" stroke="currentColor" stroke-width="6" />
+            <circle cx="27" cy="80" r="9" fill="var(--paper-raised)" stroke="currentColor" stroke-width="6" />
+            <circle cx="49" cy="51" r="16" fill="#522B2D" />
+          </svg>
+          <span class="subj">verilix 주간 다이제스트</span>
+          <span class="when">8월 넷째 주</span>
+        </div>
+        <div class="mail-body">
+          <p class="intro">이번 주는 시스템 설계 쪽에 대화가 몰렸습니다. 주 초에 잡은 로드맵 결정이 후반부 세 편의 문서로 이어졌고, 커리어 주제는 한동안 잠잠했습니다.</p>
+
+          <h4>새 문서 5</h4>
+          <div class="mail-item"><span>3분기 로드맵 확정</span><span class="d">8·24</span></div>
+          <div class="mail-item"><span>멱등성, 다시 배우기</span><span class="d">8·25</span></div>
+          <div class="mail-item"><span>실패 케이스부터 설계하기</span><span class="d">8·27</span></div>
+
+          <h4>관심사 변화</h4>
+          <div class="trend"><span style="flex:1">시스템 설계</span><span class="tag up">↑ 활발</span></div>
+          <div class="trend"><span style="flex:1">커리어</span><span class="tag down">↓ 잠잠</span></div>
+          <div class="trend"><span style="flex:1">임베딩 검색</span><span class="tag new">● 새로 시작</span></div>
+
+          <h4>확인이 필요한 모순 1</h4>
+          <div class="mail-contra">"3분기 로드맵 확정"의 결론이 지난달 "우선순위 트레이드오프"에서 정리한 방향과 어긋납니다. 어느 쪽이 최신인지 확인해 보세요.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section id="start" class="section wrap closing">
+    <div class="reveal">
+      <span class="eyebrow" style="justify-content:center">verilix</span>
+      <h2>첫 대화가, <em>첫 기록</em>이 됩니다</h2>
+      <p class="lead">지금 연결해 두면, 오늘 나눈 대화 한 마디가 나중의 당신을 돕습니다.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#top">무료로 시작하기</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <a class="brand" href="#top" aria-label="verilix">
+      <svg viewBox="8 4 296 92" role="img" aria-label="verilix">
+        <line x1="49" y1="51" x2="45" y2="19" stroke="currentColor" stroke-width="5" />
+        <line x1="49" y1="51" x2="83" y2="58" stroke="currentColor" stroke-width="5" />
+        <line x1="49" y1="51" x2="27" y2="80" stroke="currentColor" stroke-width="5" />
+        <circle cx="45" cy="19" r="7.5" fill="var(--paper)" stroke="currentColor" stroke-width="5" />
+        <circle cx="83" cy="58" r="11" fill="var(--paper)" stroke="currentColor" stroke-width="5" />
+        <circle cx="27" cy="80" r="9" fill="var(--paper)" stroke="currentColor" stroke-width="5" />
+        <circle cx="49" cy="51" r="17" fill="#522B2D" />
+        <text x="122" y="66" font-family="Fraunces, Georgia, serif" font-size="58" font-weight="600" letter-spacing="-1" fill="currentColor">verilix</text>
+      </svg>
+    </a>
+    <p>대화가 쌓일수록 깊어지는 나만의 AI 지식 파트너 · © 2026 verilix</p>
+  </div>
+</footer>
+
+<script>
+/* ---------------- theme toggle ---------------- */
+(function () {
+  var btn = document.getElementById('themeBtn');
+  var sun = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+  function effective() {
+    var t = document.documentElement.getAttribute('data-theme');
+    if (t === 'dark' || t === 'light') return t;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() { btn.innerHTML = effective() === 'dark' ? sun : moon; }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = effective() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('verilix-demo-theme', next); } catch (e) {}
+    paint();
+  });
+})();
+
+/* ---------------- in-page anchor navigation ---------------- */
+(function () {
+  var OFFSET = 76; // sticky header height
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var hash = a.getAttribute('href');
+      if (!hash || hash === '#') return;
+      if (hash === '#top') {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        history.replaceState(null, '', location.pathname + location.search);
+        return;
+      }
+      var target = document.querySelector(hash);
+      if (!target) return;
+      e.preventDefault();
+      var y = target.getBoundingClientRect().top + window.scrollY - OFFSET;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+      history.replaceState(null, '', hash);
+    });
+  });
+})();
+
+/* ---------------- scroll progress + nav shadow ---------------- */
+(function () {
+  var bar = document.getElementById('progress');
+  var nav = document.getElementById('nav');
+  function onScroll() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+    nav.classList.toggle('scrolled', window.scrollY > 8);
+  }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+
+/* ---------------- reveal on scroll ---------------- */
+(function () {
+  var els = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0, rootMargin: '240px 0px 240px 0px' });
+  els.forEach(function (el) { io.observe(el); });
+  // Safety net: nothing stays invisible even if the observer misses a fast scroll.
+  setTimeout(function () { els.forEach(function (el) { el.classList.add('in'); }); }, 1500);
+})();
+
+/* ------------------------------------------------------------------
+   Demo data — invented sample content for a personal knowledge base.
+   Structure mirrors <KnowledgeMindmap>: depth-1 tag_nodes as
+   categories + documents grouped by tag_node_id.
+------------------------------------------------------------------- */
+const RAW = {
+  "AI & 도구": [
+    "일반화되는 프롬프트 패턴",
+    "검색 증강 생성 메모",
+    "임베딩 모델 비교",
+    "에이전트 루프가 깨지는 지점",
+    "구조화된 출력과 도구 호출",
+  ],
+  "커리어": [
+    "커리어 자본을 보는 관점",
+    "연간 리뷰 다시 쓰기",
+    "떠날 때를 정하는 기준",
+    "복리로 쌓인 스킬",
+  ],
+  "의사결정": [
+    "거절을 위한 프레임워크",
+    "되돌릴 수 있는 결정 vs 없는 결정",
+    "개인 프로젝트 프리모템",
+    "직감을 언제 믿을까",
+    "기회비용, 구체적으로",
+  ],
+  "글쓰기": [
+    "편집 패스 체크리스트",
+    "진짜 문장 찾기",
+    "지속 가능한 발행 주기",
+  ],
+  "건강": [
+    "회복탄력성 플레이북",
+    "나에게 맞는 카페인 타이밍",
+    "지속 가능한 근력 루틴",
+    "생각의 도구로서의 걷기",
+  ],
+  "학습": [
+    "죄책감 없는 간격 반복",
+    "능동적으로 읽는 법",
+    "정체기를 넘는 방법",
+    "가르치며 이해하기",
+  ],
+  "제품": [
+    "로드맵 우선순위의 트레이드오프",
+    "명료한 문제 정의문 쓰기",
+    "기능을 잘라야 한다는 신호",
+  ],
+  "철학": [
+    "스토아 실천 메모 III",
+    "영원회귀에 관하여",
+    "자기연민 vs 자기비판",
+    "불확실성 속의 개인 윤리",
+    "생각을 우아하게 바꾸기",
+  ],
+  "시스템 설계": [
+    "분산 시스템 트레이드오프",
+    "멱등성, 다시 배우기",
+    "캐싱의 두 가지 어려운 부분",
+    "실패 케이스부터 설계하기",
+  ],
+};
+
+const UNCATEGORIZED = [
+  "3분기 목표 회고",
+  "벡터 검색 튜닝 실험 로그",
+  "겨울 독서 큐",
+];
+
+const SUMMARIES = [
+  "판단의 근거와 저울질한 트레이드오프, 도달한 결론을 적어둔 짧은 작업 메모. 나중에 다시 논쟁하지 않으려고.",
+  "긴 대화에서 남길 만한 부분만 추려 평이하게 다시 쓴 기록. 열린 질문은 끝에 표시해 뒀다.",
+  "들어갈 때 믿었던 것, 생각을 바꾼 계기, 그리고 앞으로 들고 갈 원칙.",
+  "맥락과 결정, 그리고 다음에 다시 하기 전에 확인할 한 가지.",
+];
+
+function isoDaysAgo(d) {
+  const t = new Date("2026-08-27T09:00:00Z");
+  t.setUTCDate(t.getUTCDate() - d);
+  return t.toISOString();
+}
+
+let idc = 0;
+const categories = Object.keys(RAW)
+  .sort((a, b) => a.localeCompare(b, "ko"))
+  .map((name) => ({ id: "cat-" + idc++, name }));
+
+let docSeed = 0;
+const documents = [];
+categories.forEach((cat) => {
+  RAW[cat.name].forEach((title) => {
+    documents.push({
+      id: "doc-" + docSeed,
+      title,
+      summary: SUMMARIES[docSeed % SUMMARIES.length],
+      updated_at: isoDaysAgo(docSeed),
+      tag_node_id: cat.id,
+    });
+    docSeed++;
+  });
+});
+UNCATEGORIZED.forEach((title) => {
+  documents.push({
+    id: "doc-" + docSeed,
+    title,
+    summary: SUMMARIES[docSeed % SUMMARIES.length],
+    updated_at: isoDaysAgo(docSeed),
+    tag_node_id: null,
+  });
+  docSeed++;
+});
+
+/* ---------- sidebar list (newest first, trimmed) ---------- */
+const pfList = document.getElementById("pfList");
+const fmtDate = (iso) =>
+  new Date(iso).toLocaleDateString("ko-KR", { year: "numeric", month: "numeric", day: "numeric" });
+[...documents]
+  .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+  .slice(0, 7)
+  .forEach((doc) => {
+    const row = document.createElement("div");
+    row.className = "it";
+    row.innerHTML =
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>' +
+      '<span class="t">' + doc.title + '<small>' + fmtDate(doc.updated_at) + '</small></span>';
+    pfList.appendChild(row);
+  });
+
+/* ------------------------------------------------------------------
+   Radial mindmap — geometry from src/components/notes/knowledge-mindmap.tsx
+------------------------------------------------------------------- */
+const CENTER = 50;
+const CATEGORY_RADIUS = 26;
+const DOC_RADIUS = 43;
+const DOC_RADIUS_INNER = 37;
+const DOC_RADIUS_OUTER = 49;
+const DOC_RING_SPLIT_THRESHOLD = 5;
+const MAX_DOC_SPREAD_DEG = 68;
+const UNCATEGORIZED_ID = "__uncategorized__";
+const NS = "http://www.w3.org/2000/svg";
+
+function polar(cx, cy, r, angleDeg) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+function mk(name, attrs) {
+  const n = document.createElementNS(NS, name);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+}
+
+const byTag = new Map();
+const uncategorized = [];
+documents.forEach((d) => {
+  if (d.tag_node_id) {
+    const a = byTag.get(d.tag_node_id) || [];
+    a.push(d);
+    byTag.set(d.tag_node_id, a);
+  } else uncategorized.push(d);
+});
+const groups = categories
+  .map((c) => ({ id: c.id, name: c.name, docs: byTag.get(c.id) || [] }))
+  .filter((g) => g.docs.length > 0);
+if (uncategorized.length) groups.push({ id: UNCATEGORIZED_ID, name: "미분류", docs: uncategorized });
+
+const n = groups.length;
+const slotAngle = 360 / n;
+const categoryPositions = [];
+const docPositions = [];
+groups.forEach((group, i) => {
+  const angle = i * slotAngle - 90;
+  const cPos = polar(CENTER, CENTER, CATEGORY_RADIUS, angle);
+  categoryPositions.push({ id: group.id, name: group.name, x: cPos.x, y: cPos.y, angle });
+
+  const docCount = group.docs.length;
+  const spread = Math.min(slotAngle * 0.82, MAX_DOC_SPREAD_DEG);
+  const splitRings = docCount >= DOC_RING_SPLIT_THRESHOLD;
+  group.docs.forEach((doc, j) => {
+    const docAngle = docCount === 1 ? angle : angle - spread / 2 + (spread * j) / (docCount - 1);
+    const radius = splitRings ? (j % 2 === 0 ? DOC_RADIUS_OUTER : DOC_RADIUS_INNER) : DOC_RADIUS;
+    const dPos = polar(CENTER, CENTER, radius, docAngle);
+    docPositions.push({ doc, groupId: group.id, x: dPos.x, y: dPos.y });
+  });
+});
+
+const svg = document.getElementById("graph");
+let hoveredId = null;
+let selectedDoc = null;
+
+const defs = mk("defs", {});
+defs.innerHTML =
+  '<filter id="mindmap-glow" x="-60%" y="-60%" width="220%" height="220%">' +
+  '<feGaussianBlur stdDeviation="1.6" result="blur" />' +
+  '<feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>';
+svg.appendChild(defs);
+
+const rootLines = [];
+const docLines = [];
+const catGroupsEl = [];
+const docGroupsEl = [];
+
+function activeGroupId() {
+  if (selectedDoc) return selectedDoc.tag_node_id || UNCATEGORIZED_ID;
+  if (!hoveredId) return null;
+  if (categoryPositions.some((c) => c.id === hoveredId)) return hoveredId;
+  const dp = docPositions.find((d) => d.doc.id === hoveredId);
+  return dp ? dp.groupId : null;
+}
+
+categoryPositions.forEach((c) => {
+  const l = mk("line", {
+    x1: CENTER, y1: CENTER, x2: c.x, y2: c.y,
+    stroke: "var(--line-strong)", "stroke-width": 0.35, opacity: 0.55,
+  });
+  l.style.transition = "opacity 300ms ease, stroke-width 300ms ease";
+  l.dataset.group = c.id;
+  svg.appendChild(l);
+  rootLines.push(l);
+});
+
+docPositions.forEach(({ doc, groupId, x, y }) => {
+  const cat = categoryPositions.find((c) => c.id === groupId);
+  const l = mk("line", {
+    x1: cat.x, y1: cat.y, x2: x, y2: y,
+    stroke: "var(--line)", "stroke-width": 0.22, opacity: 0.4,
+  });
+  l.style.transition = "opacity 300ms ease";
+  l.dataset.group = groupId;
+  svg.appendChild(l);
+  docLines.push(l);
+});
+
+svg.appendChild(mk("circle", { cx: CENTER, cy: CENTER, r: 1.6, fill: "var(--green)", class: "mindmap-pulse" }));
+
+categoryPositions.forEach((c) => {
+  const g = mk("g", { class: "cat-group" });
+  const cos = Math.cos((c.angle * Math.PI) / 180);
+  const sin = Math.sin((c.angle * Math.PI) / 180);
+  const horizontal = Math.abs(cos) >= 0.3;
+
+  const circle = mk("circle", { cx: c.x, cy: c.y, r: 3, fill: "var(--green)" });
+  circle.style.transition = "r 200ms ease";
+  const text = mk("text", {
+    x: c.x + (horizontal ? (cos > 0 ? 4.4 : -4.4) : 0),
+    y: c.y + (horizontal ? 1 : sin > 0 ? 6.4 : -4.8),
+    "text-anchor": horizontal ? (cos > 0 ? "start" : "end") : "middle",
+    "font-family": "Inter, sans-serif",
+    "font-size": 2.6, "font-weight": 600, fill: "var(--ink)",
+  });
+  text.textContent = c.name;
+  g.appendChild(circle);
+  g.appendChild(text);
+  g.__circle = circle;
+  g.__id = c.id;
+  g.addEventListener("mouseenter", () => { hoveredId = c.id; refresh(); });
+  g.addEventListener("mouseleave", () => { if (hoveredId === c.id) hoveredId = null; refresh(); });
+  svg.appendChild(g);
+  catGroupsEl.push(g);
+});
+
+docPositions.forEach(({ doc, groupId, x, y }) => {
+  const g = mk("g", { class: "doc-group" });
+  const circle = mk("circle", { cx: x, cy: y, r: 1.3, fill: "var(--sage)" });
+  circle.style.transition = "r 180ms ease, fill 180ms ease";
+  const title = mk("title", {});
+  title.textContent = doc.title || "제목 없음";
+  g.appendChild(circle);
+  g.appendChild(title);
+  g.__circle = circle;
+  g.__doc = doc;
+  g.__group = groupId;
+  g.addEventListener("mouseenter", () => { hoveredId = doc.id; refresh(); });
+  g.addEventListener("mouseleave", () => { if (hoveredId === doc.id) hoveredId = null; refresh(); });
+  g.addEventListener("click", (e) => { e.stopPropagation(); selectedDoc = doc; refresh(); renderPopover(); });
+  svg.appendChild(g);
+  docGroupsEl.push(g);
+});
+
+document.addEventListener("click", (e) => {
+  const pop = document.querySelector(".popover");
+  if (selectedDoc && pop && !pop.contains(e.target)) {
+    selectedDoc = null;
+    refresh();
+    renderPopover();
+  }
+});
+
+function refresh() {
+  const act = activeGroupId();
+  rootLines.forEach((l) => {
+    const on = act === null || act === l.dataset.group;
+    l.setAttribute("stroke-width", on ? 0.35 : 0.2);
+    l.setAttribute("opacity", act === null ? 0.55 : on ? 0.9 : 0.12);
+  });
+  docLines.forEach((l) => {
+    const on = act === null || act === l.dataset.group;
+    l.setAttribute("stroke-width", on ? 0.22 : 0.15);
+    l.setAttribute("opacity", act === null ? 0.4 : on ? 0.75 : 0.06);
+  });
+  catGroupsEl.forEach((g) => {
+    const dim = act !== null && act !== g.__id;
+    g.style.opacity = dim ? 0.28 : 1;
+    const hov = hoveredId === g.__id;
+    g.__circle.setAttribute("r", hov ? 3.6 : 3);
+    g.__circle.setAttribute("filter", hov ? "url(#mindmap-glow)" : "");
+  });
+  docGroupsEl.forEach((g) => {
+    const dim = act !== null && act !== g.__group;
+    g.style.opacity = dim ? 0.22 : 1;
+    const hov = hoveredId === g.__doc.id;
+    const sel = selectedDoc && selectedDoc.id === g.__doc.id;
+    g.__circle.setAttribute("r", hov || sel ? 1.9 : 1.3);
+    g.__circle.setAttribute("fill", sel ? "var(--green-light)" : hov ? "var(--green)" : "var(--sage)");
+    g.__circle.setAttribute("filter", hov || sel ? "url(#mindmap-glow)" : "");
+  });
+}
+
+function renderPopover() {
+  const host = document.getElementById("mindmapInner");
+  const existing = host.querySelector(".popover");
+  if (existing) existing.remove();
+  if (!selectedDoc) return;
+  const pos = docPositions.find((d) => d.doc.id === selectedDoc.id);
+  if (!pos) return;
+  const left = Math.min(84, Math.max(16, pos.x));
+  const pop = document.createElement("div");
+  pop.className = "popover";
+  pop.style.left = left + "%";
+  pop.style.top = pos.y + "%";
+  pop.style.transform = pos.y < 38 ? "translate(-50%, 14px)" : "translate(-50%, calc(-100% - 14px))";
+  pop.innerHTML =
+    '<p class="pv-title">' + (selectedDoc.title || "제목 없음") + "</p>" +
+    (selectedDoc.summary ? '<p class="pv-summary">' + selectedDoc.summary + "</p>" : "") +
+    '<div class="pv-foot"><span class="pv-date">' +
+    new Date(selectedDoc.updated_at).toLocaleDateString("ko-KR") +
+    '</span><button class="pv-open">열기 ' +
+    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>' +
+    "</button></div>";
+  host.appendChild(pop);
+}
+
+refresh();
+</script>
+</body>
+</html>

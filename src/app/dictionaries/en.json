@@ -1,0 +1,183 @@
+{
+  "common": {
+    "appName": "verilix",
+    "tagline": "Your AI Knowledge Partner"
+  },
+  "landing": {
+    "nav": {
+      "login": "Log in",
+      "signup": "Get started"
+    },
+    "rail": [
+      "Intro",
+      "Loop",
+      "Distill",
+      "Connect",
+      "Library"
+    ],
+    "hero": {
+      "eyebrow": "Give the AI you already use a memory",
+      "titleLines": [
+        "Conversations that scattered",
+        "become knowledge that stays"
+      ],
+      "subtitle": "Connect the AI tools you already use to verilix. Your conversations get distilled into structured notes that build up — and only what's relevant flows into the next one.",
+      "cta": "Connect for free",
+      "ctaSecondary": "MCP connection · no cost",
+      "freeNote": "No card required. Start in a minute.",
+      "scrollHint": "Scroll"
+    },
+    "loop": {
+      "heading": "A loop that deepens as you use it",
+      "subheading": "No conversation ends when it ends. What you talk through becomes the ground for the next one, again and again.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Talk to your connected AI",
+          "description": "Ask and think out loud in the tool you already use. Organizing it is verilix's job."
+        },
+        {
+          "number": "02",
+          "title": "Distilled into a note",
+          "description": "Once a topic matures, it is saved as a structured note — title, summary, conclusion, learnings, action items."
+        },
+        {
+          "number": "03",
+          "title": "Builds your knowledge base",
+          "description": "Notes don't scatter. They're grouped by category and tag into a knowledge base that's yours."
+        },
+        {
+          "number": "04",
+          "title": "Fed into the next talk",
+          "description": "Bring the topic up again later and only the notes that matter right now are quietly carried into the conversation."
+        }
+      ]
+    },
+    "distill": {
+      "heading": "One conversation, one clean note",
+      "subheading": "No summarizing on your side. verilix pulls the essentials out of the talk and gives them structure.",
+      "transcriptLabel": "Conversation with a connected AI",
+      "transcript": [
+        {
+          "role": "you",
+          "text": "Based on the three options we narrowed down last time, help me set the direction for this project."
+        },
+        {
+          "role": "ai",
+          "text": "I looked back at the three. Given where things stand, the second fits best — on both risk and timeline…"
+        },
+        {
+          "role": "you",
+          "text": "Good. So what needs to happen by next week?"
+        },
+        {
+          "role": "ai",
+          "text": "Flesh the plan out into a doc, share it with the team, and fold in their feedback — in that order."
+        }
+      ],
+      "docLabel": "Auto-organized note",
+      "docTitle": "Project direction — summary",
+      "fields": [
+        {
+          "heading": "Summary",
+          "body": "Narrowed from three options to the second direction"
+        },
+        {
+          "heading": "Key conclusion",
+          "body": "Second direction chosen, weighing risk and timeline"
+        },
+        {
+          "heading": "Learnings",
+          "body": "Setting criteria first beats narrowing options first when deciding direction"
+        },
+        {
+          "heading": "Action items",
+          "body": "Flesh out the plan → share with the team → fold in feedback"
+        }
+      ],
+      "categoryLabel": "Category",
+      "category": "Projects",
+      "tagsLabel": "Tags",
+      "tags": [
+        "Decision",
+        "Execution plan",
+        "Next steps"
+      ]
+    },
+    "connect": {
+      "badge": "Free",
+      "heading": "Connected in a minute",
+      "subheading": "Paste the address below into your AI tool's connector settings and sign in with your verilix account. From then on, that conversation can search and save to your knowledge base.",
+      "serverLabel": "MCP server address",
+      "serverHint": "Paste this into the connector setup screen.",
+      "methods": [
+        {
+          "title": "OAuth login",
+          "description": "Just enter the address — a login screen appears, and connecting your account is all it takes. No key to copy."
+        },
+        {
+          "title": "API key",
+          "description": "For tools where you enter values in a config file, pass an issued key as a Bearer token alongside the address."
+        }
+      ],
+      "terminalLabel": "Connected AI tool",
+      "calls": [
+        {
+          "tool": "search_knowledge(...)",
+          "detail": "Found 3 related notes in the knowledge base"
+        },
+        {
+          "tool": "save_document(...)",
+          "detail": "Saved this conversation as a new note"
+        },
+        {
+          "tool": "list_documents(...)",
+          "detail": "Swept the full library and tidied tags and folders"
+        }
+      ],
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "library": {
+      "heading": "Keep what you've built",
+      "subheading": "We thought about a library you'd want to open every day before we thought about a feature list.",
+      "items": [
+        {
+          "title": "Auto-structured",
+          "description": "Pulls title, summary, conclusion, learnings and action items out of the conversation."
+        },
+        {
+          "title": "Nothing is lost",
+          "description": "Every edit is kept as a version, and deleted notes stay in the trash for you to restore."
+        },
+        {
+          "title": "Stays organized",
+          "description": "Folders, categories and tags keep a growing pile of notes easy to scan."
+        },
+        {
+          "title": "Search by meaning",
+          "description": "Finds notes that are close in meaning, even when the words don't line up exactly."
+        },
+        {
+          "title": "Weekly digest",
+          "description": "An email each week on what piled up and how your interests shifted."
+        },
+        {
+          "title": "Same knowledge everywhere",
+          "description": "Use it on this screen, or from the other AI tools you already use — one knowledge base."
+        }
+      ]
+    },
+    "cta": {
+      "kicker": "Start free",
+      "heading": "Your first conversation becomes your first record",
+      "subheading": "Connect now, and a line from today's conversation is still there for you later.",
+      "button": "Connect for free",
+      "note": "There's no charge for the MCP connection."
+    },
+    "footer": {
+      "tagline": "Your own AI knowledge partner, growing deeper with every conversation",
+      "copyright": "© {year} verilix"
+    }
+  }
+}
