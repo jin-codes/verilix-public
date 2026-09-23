@@ -39,6 +39,105 @@ function polar(cx: number, cy: number, r: number, angleDeg: number) {
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }
 }
 
+// --- 카테고리 라벨 배치 ---------------------------------------------------------------------
+// 카테고리 수가 늘면 원 위에서 이웃 노드 간격이 좁아져(15개면 약 11 단위) 각도만으로 라벨 위치를
+// 정하던 방식은 서로 겹치거나 좌우 끝에서 잘리고 문서 점을 덮는다. 글자 폭을 추정해 후보 위치들 중
+// 이미 놓인 라벨/카테고리 점/문서 점/화면 가장자리와 겹치지 않는 곳을 고른다.
+const LABEL_FONT_SIZE = 2.6
+const LABEL_EDGE_MIN = 0.8
+const LABEL_EDGE_MAX = 99.2
+const LABEL_PAD = 0.5
+
+type LabelAnchor = 'start' | 'middle' | 'end'
+interface LabelPlacement { x: number; y: number; anchor: LabelAnchor }
+interface Box { x0: number; y0: number; x1: number; y1: number }
+
+// 브라우저 측정 없이 쓰는 근사 폭(SVG 단위). 한글/CJK는 전각, 대문자·넓은 글자는 약간 넓게 본다.
+function estimateTextWidth(text: string, fontSize: number): number {
+  let em = 0
+  for (const ch of text) {
+    const code = ch.codePointAt(0) ?? 0
+    if (code >= 0x1100) em += 1.0
+    else if (ch === ' ') em += 0.3
+    else if (/[MWmw@]/.test(ch)) em += 0.85
+    else if (/[A-Z]/.test(ch)) em += 0.68
+    else if (/[il.,'|!:;]/.test(ch)) em += 0.3
+    else em += 0.56
+  }
+  return em * fontSize * 1.05
+}
+
+function textBox(x: number, y: number, anchor: LabelAnchor, width: number): Box {
+  const x0 = anchor === 'start' ? x : anchor === 'end' ? x - width : x - width / 2
+  return { x0, y0: y - LABEL_FONT_SIZE * 0.8, x1: x0 + width, y1: y + LABEL_FONT_SIZE * 0.3 }
+}
+
+function overlapArea(a: Box, b: Box, pad: number): number {
+  const w = Math.min(a.x1 + pad, b.x1 + pad) - Math.max(a.x0 - pad, b.x0 - pad)
+  const h = Math.min(a.y1 + pad, b.y1 + pad) - Math.max(a.y0 - pad, b.y0 - pad)
+  return w > 0 && h > 0 ? w * h : 0
+}
+
+function outsideArea(b: Box): number {
+  // 화면 밖으로 나간 만큼을 큰 가중치로 벌점 처리
+  const overflowX = Math.max(0, LABEL_EDGE_MIN - b.x0) + Math.max(0, b.x1 - LABEL_EDGE_MAX)
+  const overflowY = Math.max(0, 2 - b.y0) + Math.max(0, b.y1 - 98)
+  return (overflowX + overflowY) * 20
+}
+
+function placeCategoryLabels(
+  categories: { id: string; name: string; x: number; y: number; angle: number }[],
+  docs: { x: number; y: number }[]
+): Map<string, LabelPlacement> {
+  const result = new Map<string, LabelPlacement>()
+  const obstacles: Box[] = []
+  for (const c of categories) obstacles.push({ x0: c.x - 3.6, y0: c.y - 3.6, x1: c.x + 3.6, y1: c.y + 3.6 })
+  for (const d of docs) obstacles.push({ x0: d.x - 1.9, y0: d.y - 1.9, x1: d.x + 1.9, y1: d.y + 1.9 })
+
+  // 좌우 끝처럼 선택지가 적은 노드부터 놓아야 위/아래 노드가 남은 자리를 쓴다
+  const order = [...categories].sort((a, b) => Math.abs(Math.cos((b.angle * Math.PI) / 180)) - Math.abs(Math.cos((a.angle * Math.PI) / 180)))
+  const placed: Box[] = []
+
+  for (const c of order) {
+    const cos = Math.cos((c.angle * Math.PI) / 180)
+    const sin = Math.sin((c.angle * Math.PI) / 180)
+    const width = estimateTextWidth(c.name, LABEL_FONT_SIZE)
+    const side = cos > 0 ? 1 : -1
+    const gap = 4.4
+
+    const sideOut: LabelPlacement = { x: c.x + side * gap, y: c.y + 1, anchor: side > 0 ? 'start' : 'end' }
+    const sideIn: LabelPlacement = { x: c.x - side * gap, y: c.y + 1, anchor: side > 0 ? 'end' : 'start' }
+    const above: LabelPlacement = { x: c.x, y: c.y - 4.8, anchor: 'middle' }
+    const below: LabelPlacement = { x: c.x, y: c.y + 6.4, anchor: 'middle' }
+    const diagonals: LabelPlacement[] = [
+      { x: c.x - 1.5, y: c.y - 4.8, anchor: 'end' },
+      { x: c.x + 1.5, y: c.y - 4.8, anchor: 'start' },
+      { x: c.x - 1.5, y: c.y + 6.4, anchor: 'end' },
+      { x: c.x + 1.5, y: c.y + 6.4, anchor: 'start' },
+    ]
+    const vertical = sin > 0 ? [below, above] : [above, below]
+    const candidates =
+      Math.abs(cos) >= 0.3 ? [sideOut, ...vertical, sideIn, ...diagonals] : [...vertical, sideOut, sideIn, ...diagonals]
+
+    let best: LabelPlacement = candidates[0]
+    let bestScore = Infinity
+    for (const cand of candidates) {
+      const box = textBox(cand.x, cand.y, cand.anchor, width)
+      let score = outsideArea(box)
+      for (const o of obstacles) score += overlapArea(box, o, LABEL_PAD)
+      for (const p of placed) score += overlapArea(box, p, LABEL_PAD) * 3
+      if (score < bestScore) {
+        bestScore = score
+        best = cand
+      }
+      if (score === 0) break
+    }
+    result.set(c.id, best)
+    placed.push(textBox(best.x, best.y, best.anchor, width))
+  }
+  return result
+}
+
 export default function KnowledgeMindmap({ lang, onOpenDocument, staticData }: KnowledgeMindmapProps) {
   const [categories, setCategories] = useState<CategoryNode[]>(() => staticData?.categories ?? [])
   const [documents, setDocuments] = useState<DocNode[]>(() => staticData?.documents ?? [])
@@ -136,7 +235,7 @@ export default function KnowledgeMindmap({ lang, onOpenDocument, staticData }: K
     const n = groups.length
     const categoryPositions: { id: string; name: string; x: number; y: number; angle: number }[] = []
     const docPositions: { doc: DocNode; groupId: string; x: number; y: number }[] = []
-    if (n === 0) return { categoryPositions, docPositions }
+    if (n === 0) return { categoryPositions, docPositions, labelPlacements: new Map<string, LabelPlacement>() }
 
     const slotAngle = 360 / n
     groups.forEach((group, i) => {
@@ -155,7 +254,8 @@ export default function KnowledgeMindmap({ lang, onOpenDocument, staticData }: K
       })
     })
 
-    return { categoryPositions, docPositions }
+    const labelPlacements = placeCategoryLabels(categoryPositions, docPositions)
+    return { categoryPositions, docPositions, labelPlacements }
   }, [groups])
 
   const docPosMap = useMemo(() => {
@@ -303,9 +403,7 @@ export default function KnowledgeMindmap({ lang, onOpenDocument, staticData }: K
           {layout.categoryPositions.map((c) => {
             const isHovered = hoveredId === c.id
             const dim = activeGroupId !== null && activeGroupId !== c.id
-            const cos = Math.cos((c.angle * Math.PI) / 180)
-            const sin = Math.sin((c.angle * Math.PI) / 180)
-            const horizontal = Math.abs(cos) >= 0.3
+            const label = layout.labelPlacements.get(c.id) ?? { x: c.x, y: c.y - 4.8, anchor: 'middle' as const }
             return (
               <g
                 key={c.id}
@@ -322,10 +420,10 @@ export default function KnowledgeMindmap({ lang, onOpenDocument, staticData }: K
                   style={{ transition: 'r 200ms ease' }}
                 />
                 <text
-                  x={c.x + (horizontal ? (cos > 0 ? 4.4 : -4.4) : 0)}
-                  y={c.y + (horizontal ? 1 : sin > 0 ? 6.4 : -4.8)}
-                  textAnchor={horizontal ? (cos > 0 ? 'start' : 'end') : 'middle'}
-                  fontSize="2.6"
+                  x={label.x}
+                  y={label.y}
+                  textAnchor={label.anchor}
+                  fontSize={LABEL_FONT_SIZE}
                   fontWeight={600}
                   fill="var(--foreground)"
                   style={{ pointerEvents: 'none' }}
