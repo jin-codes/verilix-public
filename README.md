@@ -6,6 +6,13 @@
 
 *A personal knowledge base that plugs into the AI tools you already use via MCP. Conversations become structured documents, and those documents become context for the next conversation.*
 
+## 스크린샷
+![랜딩 — 지식 그래프가 마우스에 반응하는 히어로](docs/screenshots/landing-hero.webp)
+
+| 랜딩 — 라이브러리 소개 | 지식 지도 |
+|---|---|
+| ![랜딩의 기능 카드 섹션](docs/screenshots/landing-library.webp) | ![카테고리·문서를 방사형으로 보여주는 지식 지도](docs/screenshots/knowledge-map.webp) |
+
 ## 주요 기능
 - **MCP 서버** — 12개 툴(검색·저장·편집·삭제/복구·버전 이력·링크·카테고리·폴더). OAuth(PKCE + 동의 화면) 또는 API 키로 연결
 - **git 방식 문서 버전 관리** — 수정/삭제 전 상태를 커밋 메시지와 함께 스냅샷, 소프트 삭제 + 롤백
