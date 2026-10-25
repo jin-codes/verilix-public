@@ -32,7 +32,7 @@
 Next.js (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Postgres, pgvector, RLS, Auth) · Anthropic API · Gemini Embeddings · Vercel
 
 ## 설계 포인트
-- **RLS 중심 보안**: 모든 테이블 RLS, 서비스 롤은 서버 전용 + 소유자 검증 후에만 사용. 권한 컬럼은 트리거로 보호, `security definer` 함수는 명시적 권한 회수. 자세한 원칙은 [CLAUDE.md](CLAUDE.md)의 "보안 모델" 참고
+- **RLS 중심 보안**: 모든 테이블 RLS, 서비스 롤은 서버 전용 + 소유자 검증 후에만 사용. 권한 컬럼은 트리거로 보호, `security definer` 함수는 명시적 권한 회수. 자세한 원칙은 [CLAUDE.ko.md](CLAUDE.ko.md)의 "보안 모델" 참고
 - **OAuth 자체 구현**: RFC 7591(DCR) / 8414 / 9728 / PKCE, 동의 화면 + CSRF·clickjacking·XSS 방어, 코드·리프레시 토큰 단일 사용 보장
 - **서버 결정론 + LLM 서술 분리**: 다이제스트의 트렌드는 스냅샷 diff로 서버가 계산하고, LLM은 설명만 작성
 

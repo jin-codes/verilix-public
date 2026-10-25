@@ -32,7 +32,7 @@
 Next.js (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Postgres, pgvector, RLS, Auth) · Anthropic API · Gemini Embeddings · Vercel
 
 ## Design highlights
-- **RLS-first security**: RLS on every table; the service role is server-only and used only after ownership checks. Privileged columns are protected by a trigger, and `security definer` functions have their execute rights explicitly revoked. See the "보안 모델" (security model) section of [CLAUDE.md](CLAUDE.md) (written in Korean)
+- **RLS-first security**: RLS on every table; the service role is server-only and used only after ownership checks. Privileged columns are protected by a trigger, and `security definer` functions have their execute rights explicitly revoked. See the "Security model" section of [CLAUDE.md](CLAUDE.md)
 - **Hand-built OAuth**: RFC 7591 (DCR) / 8414 / 9728 / PKCE, a consent screen with CSRF, clickjacking and XSS defenses, and single-use guarantees for authorization codes and refresh tokens
 - **Deterministic server, LLM only narrates**: digest trends are computed by the server from snapshot diffs; the LLM only writes the explanation
 

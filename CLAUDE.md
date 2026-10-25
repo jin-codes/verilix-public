@@ -1,6 +1,8 @@
-디자인 토큰은 `DESIGN_TOKENS.md`를 따를 것.
-`tokens.ts`는 이 문서의 값을 코드로 그대로 옮긴 참고용 미러이며, 실제 Tailwind 구현은 `src/app/globals.css`의 `@theme`/`:root`(light)/`.dark`(dark) CSS 변수다 (Tailwind v4는 `@config` 없이 JS config를 로드하지 않으므로 `tailwind.config.ts`는 존재하지 않음).
-값이 어긋나면 항상 `DESIGN_TOKENS.md`가 진실이다. 임의 색상 변경 절대 금지.
+[한국어](CLAUDE.ko.md) · **English**
+
+Follow `DESIGN_TOKENS.md` for design tokens.
+`tokens.ts` is a reference mirror of that document's values. The real Tailwind implementation is the `@theme` / `:root` (light) / `.dark` (dark) CSS variables in `src/app/globals.css` (Tailwind v4 does not load a JS config without `@config`, so there is no `tailwind.config.ts`).
+If values disagree, `DESIGN_TOKENS.md` is the source of truth. Never change colors arbitrarily.
 
 
 
@@ -8,98 +10,98 @@
 
 # Verilix
 
-## 서비스 한 줄 정의
-**MCP로 연결된 AI(ChatGPT/Claude/Gemini 등)와의 대화를 구조화된 문서로 쌓아, 다음 대화를 더 깊게 만드는 개인 지식 베이스.**
+## One-line definition
+**A personal knowledge base that turns conversations with MCP-connected AI (ChatGPT / Claude / Gemini, etc.) into structured documents, so the next conversation goes deeper.**
 
-## 핵심 루프
-연결된 AI와 대화 → 구조화된 문서로 저장 → 지식 베이스 축적 → 검색(의미 + 단어)으로 관련 문서 선별 → 다음 대화의 컨텍스트로 주입 → 반복
+## Core loop
+Talk to a connected AI → save as a structured document → knowledge base grows → hybrid search (semantic + word) picks relevant documents → inject as context for the next conversation → repeat
 
-## 제품 범위
-- **MCP 서버** — 외부 AI가 툴 호출로 지식 베이스를 검색·저장·정리 (`/api/mcp`)
-- **웹 문서 뷰어** — 문서 목록/상세/편집, 태그 필터, 검색, 지식 지도(마인드맵)
-- **주간 다이제스트** — 이번 주 쌓인 문서·관심사 변화·모순을 요약해 메일 발송
-- (과거에 있던 자체 웹 채팅은 제거됨. DB 테이블만 보존)
+## Product scope
+- **MCP server** — external AI searches, saves, and organizes the knowledge base through tool calls (`/api/mcp`)
+- **Web document viewer** — document list / detail / edit, tag filter, search, knowledge map (mind map)
+- **Weekly digest** — an email summarizing this week's new documents, interest shifts, and contradictions
+- (The former built-in web chat was removed; only its DB tables are kept.)
 
-## 핵심 UX 원칙
-1. **고정 네비게이션** — 자연어 커맨드바/자동 서피싱 패널 없음. 모든 액션은 버튼/메뉴/클릭 같은 명시적 UI 조작.
-2. **웹 UI와 MCP는 대등한 진입점** — 같은 지식 베이스를 웹에서 브라우징하거나, 외부 AI에서 MCP 툴로 다룬다.
-3. 2단 셸: 1열 = 접이식 목록 패널(상단 모드 탭 `MCP`/`지식 베이스` + 목록 + 계정 푸터), 2열 = 선택 항목 상세. 모바일은 탭바 + 목록↔상세 스택으로 재구성.
+## Core UX principles
+1. **Fixed navigation** — no natural-language command bar or auto-surfacing panel. Every action is an explicit UI operation: a button, menu, or click.
+2. **The web UI and MCP are equal entry points** — the same knowledge base can be browsed on the web or used from an external AI via MCP tools.
+3. Two-column shell: column 1 = collapsible list panel (mode tabs `MCP` / `Knowledge base` on top, then the list, then an account footer), column 2 = detail of the selected item. On mobile this becomes a tab bar plus a list ↔ detail stack.
 
 ---
 
-## 기술 스택
-Next.js (App Router, Turbopack) · TypeScript · Tailwind CSS v4 + shadcn/ui · Supabase (Postgres + pgvector + RLS + Auth) · Anthropic API (문서 분류·다이제스트) · Gemini Embeddings (`gemini-embedding-001`, 768차원) · Nodemailer(SMTP) · Vercel (Cron 포함)
+## Tech stack
+Next.js (App Router, Turbopack) · TypeScript · Tailwind CSS v4 + shadcn/ui · Supabase (Postgres + pgvector + RLS + Auth) · Anthropic API (document classification, digest) · Gemini Embeddings (`gemini-embedding-001`, 768 dims) · Nodemailer (SMTP) · Vercel (including Cron)
 
-다국어(ko/en)는 자체 구현: `src/proxy.ts`가 locale을 감지해 `/[lang]/...`로 리다이렉트.
+i18n (ko/en) is custom: `src/proxy.ts` detects the locale and redirects to `/[lang]/...`.
 
-## 폴더 구조
+## Folder structure
 ```
 src/
-├── proxy.ts               # locale 리다이렉트 (matcher에서 /auth, /api, /.well-known 제외)
+├── proxy.ts               # locale redirect (matcher excludes /auth, /api, /.well-known)
 ├── app/
-│   ├── [lang]/            # 랜딩, login, onboarding, mcp, notes, settings, admin, demo
+│   ├── [lang]/            # landing, login, onboarding, mcp, notes, settings, admin, demo
 │   ├── api/
-│   │   ├── [transport]/   # MCP 서버 마운트 (/api/mcp)
-│   │   ├── mcp/oauth/     # OAuth: register(DCR) / authorize(동의 화면) / token
-│   │   ├── documents/     # 검색·편집·온보딩 문서 생성
-│   │   ├── settings/byok/ # 사용자 API 키(암호화 저장)
-│   │   ├── cron/          # 주간 다이제스트
-│   │   └── account/       # 계정 탈퇴
-│   ├── auth/callback/     # OAuth 콜백 — locale 밖에 둔다(Supabase Redirect URL과 1:1)
+│   │   ├── [transport]/   # MCP server mount (/api/mcp)
+│   │   ├── mcp/oauth/     # OAuth: register (DCR) / authorize (consent screen) / token
+│   │   ├── documents/     # search, edit, onboarding document creation
+│   │   ├── settings/byok/ # user API keys (stored encrypted)
+│   │   ├── cron/          # weekly digest
+│   │   └── account/       # account deletion
+│   ├── auth/callback/     # OAuth callback — kept outside [lang] (1:1 with the Supabase Redirect URL)
 │   └── .well-known/       # OAuth discovery (RFC 8414 / 9728)
 ├── components/            # landing, notes, mcp, settings, layout, admin, shared, ui
-├── mcp/                   # MCP 서버: server.ts, auth.ts, oauth.ts, tools/*
+├── mcp/                   # MCP server: server.ts, auth.ts, oauth.ts, tools/*
 └── lib/
-    ├── supabase/          # client(브라우저) / server(세션) / admin(service role, 서버 전용)
-    ├── ai/                # 문서 생성·다이제스트·임베딩·태그 어휘·BYOK 암호화
-    └── demo/              # 비공개 데모용 정적 데이터
-supabase/migrations/       # 스키마·RLS·함수 (순서대로 적용)
+    ├── supabase/          # client (browser) / server (session) / admin (service role, server only)
+    ├── ai/                # document generation, digest, embeddings, tag vocabulary, BYOK encryption
+    └── demo/              # static data for the demo page
+supabase/migrations/       # schema, RLS, functions (apply in order)
 ```
 
-## MCP 서버
-Streamable HTTP(`mcp-handler`)로 마운트. 툴: `search_knowledge` `save_document` `list_documents` `edit_document` `delete_document`(휴지통) `restore_document` `document_history` `link_documents` `list_categories` `manage_category` `manage_folder` `list_folders` `log_note`.
+## MCP server
+Mounted over Streamable HTTP (`mcp-handler`). Tools: `search_knowledge` `save_document` `list_documents` `edit_document` `delete_document` (moves to trash) `restore_document` `document_history` `link_documents` `list_categories` `manage_category` `manage_folder` `list_folders` `log_note`.
 
-- **인증 두 갈래**: `vlx_` 접두사 API 키(SHA-256 해시만 저장) / OAuth 액세스 토큰(`vlxo_`, 해시 저장). 둘 다 서비스 롤로 검증하고 `userId`를 툴에 전달한다.
-- **OAuth**: authorization_code + PKCE(S256), Dynamic Client Registration, refresh 토큰 회전. `/authorize`는 동의 화면(GET) → 허용 시에만 코드 발급(POST, Origin 검사).
-- **문서는 git처럼 버전 관리**: 수정/삭제/링크 변경 전 상태를 `document_versions`에 스냅샷 + 커밋 메시지로 남기고, 삭제는 `is_archived` 소프트 삭제라 `restore_document`로 되돌릴 수 있다.
-- **검색**: 의미 검색(pgvector `match_documents`)과 단어 검색(`search_documents_text`, tsvector + 부분 문자열)을 함께 실행해 병합.
+- **Two auth paths**: API keys with the `vlx_` prefix (only the SHA-256 hash is stored) and OAuth access tokens (`vlxo_`, hash stored). Both are verified with the service role, and `userId` is passed to the tools.
+- **OAuth**: authorization_code + PKCE (S256), Dynamic Client Registration, refresh-token rotation. `/authorize` shows a consent screen (GET) and issues a code only on approval (POST, Origin check).
+- **Documents are versioned like git**: the previous state is snapshotted into `document_versions` with a commit message before any edit, delete, or link change. Deletes are soft (`is_archived`), so `restore_document` can undo them.
+- **Search**: semantic search (pgvector `match_documents`) and word search (`search_documents_text`, tsvector + substring) run together and are merged.
 
-## 데이터 모델 (요약)
-`profiles` · `documents`(+`document_versions`) · `folders` · `tag_nodes`(카테고리 트리) · `topic_insights`/`assistant_notes`(태그별 개인화 분석) · `mcp_api_keys` · `mcp_oauth_{clients,codes,tokens}` · `mcp_usage_logs` · `user_api_keys`(BYOK, AES-256-GCM) · `digest_snapshots` · `user_feedback`. 모든 테이블 RLS 활성화(본인 데이터만). 자세한 컬럼은 `supabase/migrations/`가 원본이다.
-
----
-
-## 보안 모델 (변경 시 반드시 지킬 것)
-- **RLS는 기본 방어선**이다. 브라우저 세션(anon/authenticated)은 항상 RLS 아래에서만 동작한다.
-- **service role 클라이언트(`lib/supabase/admin.ts`, `mcp/auth.ts`)는 서버 코드에서만**, 그리고 `user_id`를 직접 검증한 뒤에만 쓴다. `/admin` 하위는 `requireAdmin()` 게이트를 통과해야 한다.
-- **`security definer` 함수는 권한을 명시적으로 회수한다.** `revoke ... from public`만으로는 부족하다 — 프로젝트의 기본 권한이 `anon`/`authenticated`에 직접 부여돼 있어 `revoke ... from anon, authenticated`까지 해야 한다. 새 함수는 필요한 롤에만 `grant execute` 한다(기본 권한은 회수해 둠).
-- **`profiles`의 권한 컬럼**(`is_admin`, `plan`, `credits_*`, `email`)은 트리거가 클라이언트 세션의 변경을 거부한다. RLS만으로는 컬럼 단위 보호가 안 된다.
-- **비밀값은 코드/문서/마이그레이션에 넣지 않는다.** 환경변수로만 주입하고 `.env*`는 커밋하지 않는다. 크론은 `CRON_SECRET`이 없으면 열지 않고 막는다(fail closed).
-- **OAuth**: redirect_uri 정확 일치, PKCE 필수, 동의 화면은 프레임 삽입 금지 + 신뢰할 수 없는 문자열(`client_name`) 이스케이프, 코드/리프레시 토큰은 조건부 update로 단일 사용 보장.
-- 이 저장소에 취약점을 발견하면 공개 이슈 대신 저장소 소유자에게 직접 알려 달라.
+## Data model (summary)
+`profiles` · `documents` (+ `document_versions`) · `folders` · `tag_nodes` (category tree) · `topic_insights` / `assistant_notes` (per-tag personalization analysis) · `mcp_api_keys` · `mcp_oauth_{clients,codes,tokens}` · `mcp_usage_logs` · `user_api_keys` (BYOK, AES-256-GCM) · `digest_snapshots` · `user_feedback`. RLS is enabled on every table (own data only). `supabase/migrations/` is the source of truth for columns.
 
 ---
 
-## 개발 컨벤션
-- `@/*` → `src/*`. Supabase 클라이언트는 `lib/supabase/{client,server}.ts`만 사용(루트에 별도 파일 금지).
-- **색상 hex 리터럴 금지** — `var(--토큰)` 또는 토큰 클래스만 쓴다(라이트/다크 자동 전환). radius도 토큰 클래스(`rounded-sm/md/lg`)만 쓴다.
-- `localStorage`/`window` 크기에 의존하는 셸은 `next/dynamic(..., { ssr: false })`로 감싼 얇은 클라이언트 컴포넌트를 거쳐 하이드레이션 불일치를 피한다(`*-page-client.tsx` 패턴).
-- 클립보드 복사는 `lib/utils.ts`의 `copyToClipboard()`(secure context 폴백 포함)를 쓴다.
-- 서버/클라이언트에서 같은 문자열을 렌더할 때 `toLocaleString()`처럼 타임존에 의존하는 API는 피한다(하이드레이션 불일치).
-- 임베딩 프로바이더/모델을 바꾸면 검색 유사도 문턱(`SIMILARITY_THRESHOLD`)을 무관/연관 쌍으로 실측해 다시 맞춘다. 모델마다 baseline이 다르다.
-- 마이그레이션은 새 파일로만 추가한다(적용된 파일 수정 금지, 비밀값/개인 이메일 하드코딩 금지).
+## Security model (must be preserved when changing code)
+- **RLS is the primary line of defense.** Browser sessions (anon / authenticated) always run under RLS.
+- **Service-role clients (`lib/supabase/admin.ts`, `mcp/auth.ts`) are server-only**, and are used only after verifying `user_id` directly. Everything under `/admin` must pass the `requireAdmin()` gate.
+- **`security definer` functions have their privileges revoked explicitly.** `revoke ... from public` is not enough — the project's default privileges grant directly to `anon` / `authenticated`, so you must also `revoke ... from anon, authenticated`. New functions get `grant execute` only for the roles that need it (default privileges have been revoked).
+- **Privileged `profiles` columns** (`is_admin`, `plan`, `credits_*`, `email`) are protected by a trigger that rejects changes from client sessions. RLS alone cannot protect individual columns.
+- **No secrets in code, docs, or migrations.** Inject them via environment variables only and never commit `.env*`. The cron endpoint fails closed: it stays shut when `CRON_SECRET` is unset.
+- **OAuth**: exact `redirect_uri` match, PKCE required; the consent screen forbids framing and escapes untrusted strings (`client_name`); authorization codes and refresh tokens are guaranteed single-use through conditional updates.
+- If you find a vulnerability in this repository, please tell the owner directly instead of opening a public issue.
 
-## 개발 시작
+---
+
+## Development conventions
+- `@/*` → `src/*`. Use only `lib/supabase/{client,server}.ts` for Supabase clients (no separate files at the repo root).
+- **No hex color literals** — use `var(--token)` or token classes only (switches automatically between light and dark). Use only token classes for radius too (`rounded-sm/md/lg`).
+- A shell that depends on `localStorage` / `window` size goes through a thin client component wrapped in `next/dynamic(..., { ssr: false })` to avoid hydration mismatches (the `*-page-client.tsx` pattern).
+- Use `copyToClipboard()` from `lib/utils.ts` for clipboard copies (it includes a fallback for non-secure contexts).
+- When rendering the same string on server and client, avoid timezone-dependent APIs such as `toLocaleString()` (hydration mismatch).
+- If you change the embedding provider or model, re-measure the search similarity threshold (`SIMILARITY_THRESHOLD`) with unrelated and related pairs. Each model has a different baseline.
+- Add migrations only as new files (never edit an applied file; never hardcode secrets or personal emails).
+
+## Getting started
 ```bash
-cp .env.example .env.local   # 값 채우기
+cp .env.example .env.local   # fill in the values
 npm install
 npm run dev                  # http://localhost:3000
 npx tsc --noEmit && npm run lint && npm run build
 ```
-환경변수 목록은 `.env.example` 참고. Supabase 프로젝트에 `supabase/migrations/`를 순서대로 적용해야 한다.
+See `.env.example` for the environment variables. Apply `supabase/migrations/` to your Supabase project in order.
 
-## 상태
-- [x] MCP 서버(검색/저장/편집/버전/폴더/카테고리/링크) + OAuth(동의 화면)
-- [x] 문서 뷰어(목록/상세/편집/검색/태그 필터/지식 지도), 모바일 반응형
-- [x] 주간 다이제스트(관심사 변화·모순 감지), 다크모드, 랜딩
-- [ ] MCP 전용 과금 체계, 결제 연동, 이메일 내보내기
+## Status
+- [x] MCP server (search / save / edit / versions / folders / categories / links) + OAuth (consent screen)
+- [x] Document viewer (list / detail / edit / search / tag filter / knowledge map), mobile responsive
+- [x] Weekly digest (interest shifts, contradiction detection), dark mode, landing page
+- [ ] MCP-specific billing, payment integration, email export
