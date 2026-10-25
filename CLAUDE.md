@@ -1,14 +1,6 @@
-This is NOT the Next.js you know.
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data.
-Read the relevant guide in node_modules/next/dist/docs/ before writing any code. Heed deprecation notices.
-
 디자인 토큰은 `DESIGN_TOKENS.md`를 따를 것.
 `tokens.ts`는 이 문서의 값을 코드로 그대로 옮긴 참고용 미러이며, 실제 Tailwind 구현은 `src/app/globals.css`의 `@theme`/`:root`(light)/`.dark`(dark) CSS 변수다 (Tailwind v4는 `@config` 없이 JS config를 로드하지 않으므로 `tailwind.config.ts`는 존재하지 않음).
 값이 어긋나면 항상 `DESIGN_TOKENS.md`가 진실이다. 임의 색상 변경 절대 금지.
-
-나의 말이 늘 옳은 것은 아니며, 특히 이러한 코딩 작업에서는 지적하는 것이 더욱 중요하므로 기술적으로 틀린 말일 경우 내 말을 두둔/실행하려 들지 말고 바로 지적하고 내 원래 의도를 생각해서 작업하라.
-또한 localhost:3000으로 확인하는것은 내가 할 것이니 직접 하려 하지않아도 된다.
-작업이 완료되면 체크리스트/주석을 자주 남겨라. 또한 커밋/푸시도 하라. 작업 완료가 확인되었을때.
 
 
 
