@@ -1,10 +1,17 @@
 import { hasLocale } from '../../dictionaries'
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
+import Link from 'next/link'
 import LoginButton from './LoginButton'
 import EmailAuthForm from './EmailAuthForm'
 
 interface Props {
   params: Promise<{ lang: string }>
+}
+
+export const metadata: Metadata = {
+  title: 'Login',
+  robots: { index: false, follow: false },
 }
 
 export default async function LoginPage({ params }: Props) {
@@ -48,11 +55,15 @@ export default async function LoginPage({ params }: Props) {
         {/* Google 로그인 버튼 */}
         <LoginButton lang={lang} />
 
-        {/* 하단 안내 */}
+        {/* 약관 링크 */}
         <p className="mt-6 text-xs text-center" style={{ color: 'var(--neutral)' }}>
-          {lang === 'ko'
-            ? '계속하면 이용약관 및 개인정보처리방침에 동의합니다.'
-            : 'By continuing, you agree to our Terms and Privacy Policy.'}
+          <Link href={`/${lang}/terms`} className="underline">
+            {lang === 'ko' ? '이용약관' : 'Terms'}
+          </Link>
+          {' · '}
+          <Link href={`/${lang}/privacy`} className="underline">
+            {lang === 'ko' ? '개인정보처리방침' : 'Privacy'}
+          </Link>
         </p>
       </div>
     </main>

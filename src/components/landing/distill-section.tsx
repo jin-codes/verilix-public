@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Reveal } from './reveal'
 import { useScrollScrub } from './use-scroll-scrub'
 import { useReducedMotion } from './use-reduced-motion'
@@ -23,11 +24,24 @@ const band = (p: number, from: number, width = 0.09) =>
 
 export function DistillSection({ dict }: { dict: DistillDict }) {
   const { ref, progress } = useScrollScrub<HTMLElement>()
+  // Phones: the section isn't pinned, so scrub against the card grid itself
+  // (finishing while the document card is on screen) instead of the section.
+  const { ref: gridRef, progress: gridProgress } = useScrollScrub<HTMLDivElement>()
   const reduced = useReducedMotion()
+  const [narrow, setNarrow] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    const sync = () => setNarrow(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
 
   // Finish the reveal while the panel is still pinned (the section is 260vh
   // but the sticky content unpins once its bottom clears the viewport).
-  const raw = Math.min(1, Math.max(0, (progress - 0.08) / 0.6))
+  const raw = narrow
+    ? Math.min(1, Math.max(0, (gridProgress - 0.14) / 0.34))
+    : Math.min(1, Math.max(0, (progress - 0.08) / 0.6))
   const p = reduced ? 1 : raw
 
   const fieldStart = 0.34
@@ -36,7 +50,7 @@ export function DistillSection({ dict }: { dict: DistillDict }) {
 
   return (
     <section ref={ref} id="distill" className="relative px-6 md:min-h-[260vh]">
-      <div className="md:sticky md:top-0 md:min-h-screen flex flex-col justify-center py-16 md:py-20">
+      <div className="md:sticky md:top-0 md:min-h-screen flex flex-col justify-center py-14 md:py-20">
         <div className="max-w-6xl mx-auto w-full">
           <Reveal className="mb-10 md:mb-14 max-w-2xl">
             <h2
@@ -57,7 +71,7 @@ export function DistillSection({ dict }: { dict: DistillDict }) {
             </p>
           </Reveal>
 
-          <div className="grid md:grid-cols-[1fr_auto_1fr] items-stretch gap-5 md:gap-0">
+          <div ref={gridRef} className="grid md:grid-cols-[1fr_auto_1fr] items-stretch gap-5 md:gap-0">
             {/* transcript */}
             <div
               className="rounded-lg p-5 md:p-6"

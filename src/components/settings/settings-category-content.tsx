@@ -6,6 +6,7 @@ import DarkModeSettings from './dark-mode-settings'
 import DigestSettings from './digest-settings'
 import DocumentSettings from './document-settings'
 import BackgroundContext from './background-context'
+import MemorySettings from './memory-settings'
 import ByokSettings from './byok-settings'
 import AccountSettings from './account-settings'
 import type { SettingsCategory } from './settings-nav'
@@ -51,6 +52,8 @@ export default function SettingsCategoryContent({
       {activeCategory === 'profile' && (
         <BackgroundContext lang={lang} userId={userId} initialContext={initialContext} initialUpdatedAt={initialUpdatedAt} />
       )}
+
+      {activeCategory === 'memory' && <MemorySettings lang={lang} />}
 
       {activeCategory === 'byok' && <ByokSettings lang={lang} />}
 

@@ -15,6 +15,7 @@ export function registerRestoreDocumentTool(server: McpServer) {
     'restore_document',
     {
       title: 'Restore Document',
+      annotations: { readOnlyHint: false, destructiveHint: true },
       description:
         "Bring a document back in the user's verilix knowledge base. With no `toVersion`, this just takes it out of the trash (undoes delete_document). With `toVersion` (from document_history), it also rolls the document's content back to that saved version. Either way the current state is snapshotted first, so a restore can itself be undone.",
       inputSchema: {

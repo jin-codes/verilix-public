@@ -11,6 +11,7 @@ export function registerLinkDocumentsTool(server: McpServer) {
     'link_documents',
     {
       title: 'Link Documents',
+      annotations: { readOnlyHint: false, destructiveHint: true },
       description:
         'Connect documents in the user\'s verilix knowledge base so each one shows up under the other\'s "Related documents". Pass the document id plus one or more other ids in `relatedIds` — the link is bidirectional. Use `action: "unlink"` to remove the connection. Every affected document is snapshotted first (see document_history / restore_document); pass `message` to label the change. Only link or unlink when the user asked for it.',
       inputSchema: {

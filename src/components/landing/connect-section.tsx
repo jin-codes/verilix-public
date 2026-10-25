@@ -45,9 +45,9 @@ export function ConnectSection({ dict }: { dict: ConnectDict }) {
   const visibleCalls = reduced ? dict.calls.length : Math.round(p * dict.calls.length + 0.35)
 
   return (
-    <section ref={ref} id="connect" className="relative px-6 py-24 md:py-32">
+    <section ref={ref} id="connect" className="relative px-6 py-16 md:py-32">
       <div className="max-w-6xl mx-auto">
-        <Reveal className="mb-14 md:mb-16 max-w-2xl">
+        <Reveal className="mb-8 md:mb-16 max-w-2xl">
           <span
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide"
             style={{ backgroundColor: 'var(--muted)', color: 'var(--primary)' }}
@@ -76,7 +76,7 @@ export function ConnectSection({ dict }: { dict: ConnectDict }) {
         <div className="grid md:grid-cols-2 gap-5">
           <Reveal direction="left">
             <SpotlightCard
-              className="h-full rounded-lg p-6"
+              className="h-full rounded-lg p-5 md:p-6"
               style={{ backgroundColor: 'var(--surface-raised)', border: '1px solid var(--border)' }}
             >
               <p className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
@@ -87,7 +87,7 @@ export function ConnectSection({ dict }: { dict: ConnectDict }) {
               </p>
               <div className="mt-3 flex items-center gap-2">
                 <code
-                  className="flex-1 text-[13px] px-3 py-2 overflow-x-auto whitespace-nowrap rounded-sm font-mono"
+                  className="flex-1 min-w-0 text-xs sm:text-[13px] px-3 py-2 break-all rounded-sm font-mono"
                   style={{
                     backgroundColor: 'var(--background)',
                     border: '1px solid var(--border)',

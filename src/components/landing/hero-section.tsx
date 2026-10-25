@@ -10,7 +10,6 @@ interface HeroDict {
   subtitle: string
   cta: string
   ctaSecondary: string
-  freeNote: string
   scrollHint: string
 }
 
@@ -179,7 +178,7 @@ export function HeroSection({ lang, dict }: { lang: string; dict: HeroDict }) {
       id="hero"
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-6"
+      className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden px-6 pt-24 pb-28"
       style={{
         backgroundImage:
           'radial-gradient(color-mix(in srgb, var(--foreground) 5%, transparent) 1px, transparent 1px)',
@@ -262,13 +261,13 @@ export function HeroSection({ lang, dict }: { lang: string; dict: HeroDict }) {
           ))}
         </h1>
         <p
-          className="mt-7 max-w-[46ch]"
-          style={{ color: 'var(--text-secondary)', fontSize: '17px', lineHeight: 1.65 }}
+          className="mt-6 md:mt-7 max-w-[46ch] text-base md:text-[17px]"
+          style={{ color: 'var(--text-secondary)', lineHeight: 1.65 }}
         >
           {dict.subtitle}
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row items-center gap-3">
+        <div className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center gap-3">
           <Link
             href={`/${lang}/login`}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-sm text-sm font-medium transition-transform duration-200 ease-out hover:scale-[1.03] active:scale-[0.98]"
@@ -293,13 +292,10 @@ export function HeroSection({ lang, dict }: { lang: string; dict: HeroDict }) {
             {dict.ctaSecondary}
           </span>
         </div>
-        <p className="mt-4 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-          {dict.freeNote}
-        </p>
       </div>
 
       <div
-        className="absolute bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute bottom-6 md:bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         style={{ color: 'var(--muted-foreground)', opacity: 1 - exit * 1.6 }}
       >
         <span className="text-[11px] tracking-wide uppercase">{dict.scrollHint}</span>

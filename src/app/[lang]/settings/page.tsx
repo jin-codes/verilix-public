@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation'
 import SettingsPageClient from './settings-page-client'
 import type { SettingsCategory } from '@/components/settings/settings-nav'
 
-const VALID_CATEGORIES: SettingsCategory[] = ['general', 'documents', 'profile', 'byok', 'account']
+const VALID_CATEGORIES: SettingsCategory[] = ['general', 'documents', 'profile', 'memory', 'byok', 'account']
 
 interface Props {
   params: Promise<{ lang: string }>

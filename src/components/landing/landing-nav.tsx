@@ -16,7 +16,7 @@ export function LandingNav({
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => setScrolled(window.scrollY > 2)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -26,19 +26,19 @@ export function LandingNav({
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 px-6"
+      className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6"
       style={{
         backgroundColor: scrolled ? 'var(--background)' : 'transparent',
         borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
         backdropFilter: scrolled ? 'blur(8px)' : 'none',
-        transition: 'background-color 0.3s ease, border-color 0.3s ease',
+        transition: 'background-color 0.15s ease, border-color 0.15s ease',
       }}
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between h-16">
         <span className="text-base font-semibold tracking-tight" style={{ color: 'var(--foreground)' }}>
           verilix
         </span>
-        <nav className="flex items-center gap-3">
+        <nav className="flex items-center gap-2 sm:gap-3">
           <Link
             href={`/${otherLang}`}
             className="text-xs uppercase tracking-wide transition-opacity hover:opacity-70 px-1"
@@ -56,7 +56,7 @@ export function LandingNav({
           </Link>
           <Link
             href={`/${lang}/login`}
-            className="px-4 py-1.5 rounded-sm text-sm font-medium transition-opacity hover:opacity-85"
+            className="px-3 sm:px-4 py-1.5 rounded-sm text-sm font-medium whitespace-nowrap transition-opacity hover:opacity-85"
             style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }}
           >
             {signupLabel}

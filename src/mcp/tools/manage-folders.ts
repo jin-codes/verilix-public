@@ -50,17 +50,60 @@ function renderTree(folders: FolderRow[], docCounts: Map<string, number>): strin
 
 export function registerManageFoldersTool(server: McpServer) {
   server.registerTool(
+    'list_folders',
+    {
+      title: 'List Folders',
+      annotations: { readOnlyHint: true },
+      description:
+        "List the folders in the user's verilix knowledge base as a nested tree, with the number of documents in each. Use it before filing a document into a folder (edit_document) or renaming/moving/deleting one (manage_folder).",
+      inputSchema: {},
+    },
+    async (_args, extra) => {
+      const userId = extra.authInfo?.extra?.userId as string | undefined
+      const apiKeyId = extra.authInfo?.extra?.apiKeyId as string | undefined
+      if (!userId) {
+        return { content: [{ type: 'text', text: 'Unauthorized: missing API key context.' }], isError: true }
+      }
+
+      const supabase = getMcpSupabaseClient()
+      const [{ data: folders }, { data: docs }] = await Promise.all([
+        supabase.from('folders').select('id, name, parent_id, sort_order').eq('user_id', userId),
+        supabase.from('documents').select('folder_id').eq('user_id', userId).eq('is_archived', false),
+      ])
+      const counts = new Map<string, number>()
+      for (const d of (docs ?? []) as { folder_id: string | null }[]) {
+        if (d.folder_id) counts.set(d.folder_id, (counts.get(d.folder_id) ?? 0) + 1)
+      }
+      const rows = (folders ?? []) as FolderRow[]
+
+      // mcp_usage_logs.tool CHECK 제약이 'list_folders'를 모르므로 기존 'manage_folder'로 집계한다.
+      await supabase.from('mcp_usage_logs').insert({
+        user_id: userId,
+        api_key_id: apiKeyId ?? null,
+        tool: 'manage_folder',
+      })
+
+      return {
+        content: [
+          { type: 'text', text: rows.length === 0 ? 'No folders yet.' : `Folders:\n${renderTree(rows, counts)}` },
+        ],
+      }
+    }
+  )
+
+  server.registerTool(
     'manage_folder',
     {
       title: 'Manage Folders',
+      annotations: { readOnlyHint: false, destructiveHint: true },
       description:
-        "List, create, rename, move, or delete folders in the user's verilix knowledge base. Folders are a nesting structure for documents, separate from categories (tags). To put a document in a folder, call edit_document with its `folder` field.",
+        "Create, rename, move, or delete folders in the user's verilix knowledge base. Folders are a nesting structure for documents, separate from categories (tags). To view existing folders use list_folders. To put a document in a folder, call edit_document with its `folder` field.",
       inputSchema: {
-        action: z.enum(['list', 'create', 'rename', 'move', 'delete']).describe('What to do'),
+        action: z.enum(['create', 'rename', 'move', 'delete']).describe('What to do'),
         name: z
           .string()
           .optional()
-          .describe('The folder to act on (for create: the name of the new folder). Not needed for `list`.'),
+          .describe('The folder to act on (for create: the name of the new folder).'),
         newName: z.string().optional().describe("For `rename`: the folder's new name"),
         parent: z
           .string()
@@ -87,18 +130,7 @@ export function registerManageFoldersTool(server: McpServer) {
 
       let resultText: string
       try {
-        if (action === 'list') {
-          const [{ data: folders }, { data: docs }] = await Promise.all([
-            supabase.from('folders').select('id, name, parent_id, sort_order').eq('user_id', userId),
-            supabase.from('documents').select('folder_id').eq('user_id', userId).eq('is_archived', false),
-          ])
-          const counts = new Map<string, number>()
-          for (const d of (docs ?? []) as { folder_id: string | null }[]) {
-            if (d.folder_id) counts.set(d.folder_id, (counts.get(d.folder_id) ?? 0) + 1)
-          }
-          const rows = (folders ?? []) as FolderRow[]
-          resultText = rows.length === 0 ? 'No folders yet.' : `Folders:\n${renderTree(rows, counts)}`
-        } else if (action === 'create') {
+        if (action === 'create') {
           if (!name || !name.trim()) {
             return { content: [{ type: 'text', text: '`create` needs name.' }], isError: true }
           }

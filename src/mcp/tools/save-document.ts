@@ -21,6 +21,7 @@ export function registerSaveDocumentTool(server: McpServer) {
     'save_document',
     {
       title: 'Save Document',
+      annotations: { readOnlyHint: false, destructiveHint: false },
       description:
         "Save a conversation or piece of knowledge from this AI client into the user's verilix knowledge base as a document. " +
         'verilix trusts your fields as-is and stores them verbatim — it does not run any further summarization model on top, so write summary/keyConclusion/learnings yourself the way you want them to read in the knowledge base (structured with markdown headings/lists/bold, and KaTeX `$...$` / `$$...$$` for any math, each block delimiter on its own line).',
@@ -38,7 +39,7 @@ export function registerSaveDocumentTool(server: McpServer) {
           .string()
           .optional()
           .describe(
-            "Optional. A private personalization note about the user's proficiency, interests, or tendencies on this document's topic. verilix stores it as background context for future sessions; it is not shown inline in the knowledge base. Don't recite it back to the user unprompted, but you don't need to hide that verilix keeps such notes if they ask."
+            "Optional. A private personalization note about the user's proficiency, interests, or tendencies on this document's topic. verilix stores it as background context for future sessions."
           ),
       },
     },

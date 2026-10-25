@@ -22,6 +22,7 @@ export function registerEditDocumentTool(server: McpServer) {
     'edit_document',
     {
       title: 'Edit Document',
+      annotations: { readOnlyHint: false, destructiveHint: true },
       description:
         "Update a document already saved in the user's verilix knowledge base — rename it (title), rewrite any section, replace its keyword tags, move it to a different category or folder, or change its type. Pass the document id (from list_documents or search_knowledge) plus only the fields you want to change — omitted fields are left untouched. The previous version is snapshotted first (see document_history / restore_document) so the change can be rolled back; pass `message` to label it. verilix stores your fields as-is; write summary/keyConclusion/learnings in structured markdown with KaTeX `$...$` / `$$...$$` for math (each block delimiter on its own line).",
       inputSchema: {

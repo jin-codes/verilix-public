@@ -4,7 +4,8 @@ import React, { useMemo, useState } from 'react'
 import { Tag, Link2, TriangleAlert, MessageSquare, ArrowLeft } from 'lucide-react'
 import MarkdownMessage from '@/components/shared/markdown-message'
 import KnowledgeMindmap from '@/components/notes/knowledge-mindmap'
-import { DEMO_CATEGORIES, DEMO_DOCUMENTS, type DemoDocument } from '@/lib/demo/notes-data'
+import { getDemoData } from '@/lib/demo/get-demo-data'
+import type { DemoDocument } from '@/lib/demo/notes-data'
 
 interface DemoDocumentViewProps {
   lang: string
@@ -12,18 +13,6 @@ interface DemoDocumentViewProps {
   onSelectDocument: (id: string | null) => void
   isSidebarCollapsed?: boolean
   onBack?: () => void
-}
-
-const mindmapStaticData = {
-  categories: DEMO_CATEGORIES.map((c) => ({ id: c.id, name: c.name })),
-  documents: DEMO_DOCUMENTS.map((d) => ({
-    id: d.id,
-    title: d.title,
-    summary: d.summary,
-    updated_at: d.updatedAt,
-    tag_node_id: d.categoryId,
-    related_document_ids: d.relatedDocumentIds ?? null,
-  })),
 }
 
 // 실제 DocumentView(src/components/notes/document-view.tsx)의 읽기 전용 부분을 그대로 옮긴
@@ -37,9 +26,24 @@ export default function DemoDocumentView({
   isSidebarCollapsed = false,
   onBack,
 }: DemoDocumentViewProps) {
+  const demoData = useMemo(() => getDemoData(lang), [lang])
+  const mindmapStaticData = useMemo(
+    () => ({
+      categories: demoData.categories.map((c) => ({ id: c.id, name: c.name })),
+      documents: demoData.documents.map((d) => ({
+        id: d.id,
+        title: d.title,
+        summary: d.summary,
+        updated_at: d.updatedAt,
+        tag_node_id: d.categoryId,
+        related_document_ids: d.relatedDocumentIds ?? null,
+      })),
+    }),
+    [demoData]
+  )
   const doc: DemoDocument | null = useMemo(
-    () => DEMO_DOCUMENTS.find((d) => d.id === documentId) ?? null,
-    [documentId]
+    () => demoData.documents.find((d) => d.id === documentId) ?? null,
+    [demoData, documentId]
   )
 
   return (
@@ -106,10 +110,10 @@ function DemoDocumentDetail({ lang, doc, onSelectDocument }: DemoDocumentDetailP
   const relatedDocs = useMemo(() => {
     if (!doc.relatedDocumentIds?.length) return []
     return doc.relatedDocumentIds
-      .map((id) => DEMO_DOCUMENTS.find((d) => d.id === id))
+      .map((id) => getDemoData(lang).documents.find((d) => d.id === id))
       .filter((d): d is DemoDocument => Boolean(d))
       .map((d) => ({ id: d.id, title: d.title }))
-  }, [doc.relatedDocumentIds])
+  }, [lang, doc.relatedDocumentIds])
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

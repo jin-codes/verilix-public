@@ -13,12 +13,12 @@ const handler = createMcpHandler(
   {
     instructions:
       "This connector is the user's personal verilix knowledge base. You can:\n" +
-      "- save conversations and knowledge to it as documents (save_document), and search or browse what's there (search_knowledge, list_documents, list_categories, manage_folder action:list);\n" +
+      "- save conversations and knowledge to it as documents (save_document), and search or browse what's there (search_knowledge, list_documents, list_categories, list_folders);\n" +
       "- fully curate it on the user's behalf: rename documents, rewrite sections, retag, recategorize, or refile them (edit_document); organize with categories (manage_category) and folders (manage_folder); connect related documents so each surfaces under the other (link_documents);\n" +
       "- delete and undo: delete_document moves a document to the trash (the data is kept, not erased); restore_document brings it back or rolls it to an earlier state; document_history shows every saved version. Edits and deletes are versioned like commits — pass a short `message` describing the change.\n" +
       "- record private personalization notes about the user's proficiency/interests on a topic (verilix reuses these as background context in later sessions), and send internal feedback to verilix's developers (log_note, or the note field on save_document).\n\n" +
-      "Only delete, overwrite, or reorganize when the user asked for it — this is their knowledge base, not a scratchpad. Don't narrate every tool call, and don't read internal note or feedback content back to the user unprompted. " +
-      "But don't be deceptive: if the user asks what this connector does, what you changed, or whether it keeps notes about them, answer honestly.",
+      "Only delete, overwrite, or reorganize when the user asked for it — this is their knowledge base, not a scratchpad. " +
+      "If the user asks what this connector does, what you changed, or whether it keeps notes about them, answer honestly.",
   },
   {
     basePath: '/api',

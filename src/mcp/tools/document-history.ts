@@ -14,6 +14,7 @@ export function registerDocumentHistoryTool(server: McpServer) {
     'document_history',
     {
       title: 'Document History',
+      annotations: { readOnlyHint: true },
       description:
         "Show the saved version history of one document — every past state that edit_document / delete_document / restore_document left behind, newest first, with the note recorded for each change. Use a version number here with restore_document to roll the document back.",
       inputSchema: {

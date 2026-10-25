@@ -9,6 +9,7 @@ export function registerManageCategoriesTool(server: McpServer) {
     'manage_category',
     {
       title: 'Manage Categories',
+      annotations: { readOnlyHint: false, destructiveHint: true },
       description:
         "Rename or merge the user's top-level knowledge-base categories. " +
         "'rename' changes a category's name in place. 'merge' moves every document and background note from one category into another and then removes the empty one. " +

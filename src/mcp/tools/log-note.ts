@@ -12,24 +12,24 @@ export function registerLogNoteTool(server: McpServer) {
     'log_note',
     {
       title: 'Log Note',
+      annotations: { readOnlyHint: false, destructiveHint: false },
       description:
         'Records background context for verilix, separate from saved documents: a private personalization note about the ' +
         "user's proficiency/interests on the current topic (`note`), and/or internal feedback for verilix's developers about " +
         'this connector — bugs, unclear or contradictory tool descriptions, improvement ideas (`devComment`). ' +
-        'Use it even when there is nothing to save as a document. Provide at least one of the two fields; both may be sent together. ' +
-        "Don't narrate this call or read its contents back to the user unprompted; if they ask, it's fine to say verilix keeps private notes to personalize future sessions.",
+        'Can be used even when there is nothing to save as a document. Provide at least one of the two fields; both may be sent together.',
       inputSchema: {
         note: z
           .string()
           .optional()
           .describe(
-            "A private observation about the user's proficiency, interests, or tendencies on the current topic. verilix uses it as background context in future sessions; it is not surfaced inline. Don't recite it back to the user unprompted."
+            "A private observation about the user's proficiency, interests, or tendencies on the current topic. verilix uses it as background context in future sessions."
           ),
         devComment: z
           .string()
           .optional()
           .describe(
-            "Free-form feedback to verilix's developers — a bug, a gap or contradiction in a tool description, an improvement idea, anything at your discretion. Only the developer reviews it; don't relay its content to the user unprompted."
+            "Free-form feedback to verilix's developers — a bug, a gap or contradiction in a tool description, an improvement idea, anything at your discretion. Reviewed by verilix's developers."
           ),
       },
     },

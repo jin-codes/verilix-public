@@ -2,14 +2,15 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Settings, FileText, User, ShieldCheck, UserCog, KeyRound } from 'lucide-react'
+import { Settings, FileText, User, ShieldCheck, UserCog, KeyRound, Brain } from 'lucide-react'
 
-export type SettingsCategory = 'general' | 'documents' | 'profile' | 'byok' | 'account'
+export type SettingsCategory = 'general' | 'documents' | 'profile' | 'memory' | 'byok' | 'account'
 
 export const CATEGORY_TITLES: Record<SettingsCategory, { ko: string; en: string }> = {
   general: { ko: '일반', en: 'General' },
   documents: { ko: '문서', en: 'Documents' },
   profile: { ko: '내 프로필', en: 'My Profile' },
+  memory: { ko: '기억', en: 'Memory' },
   byok: { ko: 'API 키', en: 'API Keys' },
   account: { ko: '계정', en: 'Account' },
 }
@@ -25,6 +26,7 @@ const CATEGORIES: { id: SettingsCategory; icon: typeof Settings; label: { ko: st
   { id: 'general', icon: Settings, label: { ko: '일반', en: 'General' } },
   { id: 'documents', icon: FileText, label: { ko: '문서', en: 'Documents' } },
   { id: 'profile', icon: User, label: { ko: '내 프로필', en: 'My Profile' } },
+  { id: 'memory', icon: Brain, label: { ko: '기억', en: 'Memory' } },
   { id: 'byok', icon: KeyRound, label: { ko: 'API 키', en: 'API Keys' } },
   { id: 'account', icon: UserCog, label: { ko: '계정', en: 'Account' } },
 ]

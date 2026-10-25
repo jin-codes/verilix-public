@@ -30,7 +30,7 @@ export function CtaSection({ lang, dict }: { lang: string; dict: CtaDict }) {
       ref={ref}
       id="cta"
       onPointerMove={handleMove}
-      className="relative px-6 py-28 md:py-40 overflow-hidden"
+      className="relative px-6 py-20 md:py-40 overflow-hidden"
       style={{ backgroundColor: 'var(--primary)' }}
     >
       <div

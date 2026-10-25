@@ -6,6 +6,9 @@
 
 > 이미 쓰고 있는 AI 도구에 그대로 연결됩니다. 대화의 결론이 문서로 남고, 그 문서들이 쌓여 다음 대화의 컨텍스트가 됩니다.
 
+## 데모 영상
+32초 소개 영상(무음): [한국어](docs/demo/verilix-demo-ko.mp4) · [English](docs/demo/verilix-demo-en.mp4)
+
 ## 스크린샷
 ![랜딩 — 지식 그래프가 마우스에 반응하는 히어로](docs/screenshots/landing-hero.webp)
 

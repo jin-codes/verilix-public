@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { DEMO_PERSONA } from '@/lib/demo/notes-data'
+import { getDemoData } from '@/lib/demo/get-demo-data'
 
 interface DemoSidebarFooterProps {
   lang: string
@@ -14,7 +14,8 @@ interface DemoSidebarFooterProps {
 // 넘어가는 CTA로 채운다.
 export default function DemoSidebarFooter({ lang }: DemoSidebarFooterProps) {
   const isKo = lang === 'ko'
-  const initial = DEMO_PERSONA.name[0]
+  const persona = getDemoData(lang).persona
+  const initial = persona.name[0]
 
   return (
     <div className="shrink-0" style={{ borderTop: '1px solid var(--border-strong)' }}>
@@ -27,10 +28,10 @@ export default function DemoSidebarFooter({ lang }: DemoSidebarFooterProps) {
         </span>
         <div className="min-w-0">
           <p className="text-xs font-medium truncate" style={{ color: 'var(--foreground)' }}>
-            {DEMO_PERSONA.name}
+            {persona.name}
           </p>
           <p className="text-[10px] truncate" style={{ color: 'var(--muted-foreground)' }}>
-            {DEMO_PERSONA.role}
+            {persona.role}
           </p>
         </div>
       </div>

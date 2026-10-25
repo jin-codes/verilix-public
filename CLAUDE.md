@@ -65,7 +65,7 @@ supabase/migrations/       # 스키마·RLS·함수 (순서대로 적용)
 ```
 
 ## MCP 서버
-Streamable HTTP(`mcp-handler`)로 마운트. 툴: `search_knowledge` `save_document` `list_documents` `edit_document` `delete_document`(휴지통) `restore_document` `document_history` `link_documents` `list_categories` `manage_category` `manage_folder` `log_note`.
+Streamable HTTP(`mcp-handler`)로 마운트. 툴: `search_knowledge` `save_document` `list_documents` `edit_document` `delete_document`(휴지통) `restore_document` `document_history` `link_documents` `list_categories` `manage_category` `manage_folder` `list_folders` `log_note`.
 
 - **인증 두 갈래**: `vlx_` 접두사 API 키(SHA-256 해시만 저장) / OAuth 액세스 토큰(`vlxo_`, 해시 저장). 둘 다 서비스 롤로 검증하고 `userId`를 툴에 전달한다.
 - **OAuth**: authorization_code + PKCE(S256), Dynamic Client Registration, refresh 토큰 회전. `/authorize`는 동의 화면(GET) → 허용 시에만 코드 발급(POST, Origin 검사).

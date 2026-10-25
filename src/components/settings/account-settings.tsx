@@ -78,8 +78,8 @@ export default function AccountSettings({ lang, userEmail }: AccountSettingsProp
         </h3>
         <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--neutral)' }}>
           {isKo
-            ? '탈퇴 시 이 계정으로 다시 로그인할 수 없습니다.'
-            : 'You will no longer be able to sign in with this account.'}
+            ? '탈퇴하면 문서, 메모, 연결된 앱과 API 키를 포함한 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.'
+            : 'Deleting your account permanently deletes all your data, including documents, notes, connected apps and API keys. This cannot be undone.'}
         </p>
 
         <button

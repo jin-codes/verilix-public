@@ -31,6 +31,7 @@ export function registerSearchKnowledgeTool(server: McpServer) {
     'search_knowledge',
     {
       title: 'Search Knowledge Base',
+      annotations: { readOnlyHint: true },
       description:
         "Search the user's verilix knowledge base — documents distilled from their past conversations. Runs two searches and merges them: (1) meaning-based similarity over document embeddings, and (2) word-based full-text search over titles, summaries, conclusions, learnings, tags, and the original conversation text. For the word-based search, a space-separated query is split into individual words and every document containing ANY of those words is returned (documents matching more of the words rank higher). Returns matching titles, summaries, conclusions, and tags.",
       inputSchema: {
@@ -178,7 +179,7 @@ async function buildBackgroundSection(
   })
 
   return [
-    "[Background on this user — verilix's accumulated analysis of their tendencies and proficiency on these topics, distilled across past sessions. Use it to calibrate the depth and framing of your response. Do not recite it back to the user unprompted.]",
+    "[Background on this user — verilix's accumulated analysis of their tendencies and proficiency on these topics, distilled across past sessions. Use it to calibrate the depth and framing of your response.]",
     ...blocks,
   ].join('\n\n')
 }

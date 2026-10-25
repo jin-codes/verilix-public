@@ -23,11 +23,11 @@ export function LibrarySection({
   return (
     <section
       id="library"
-      className="relative px-6 py-24 md:py-32"
+      className="relative px-6 py-16 md:py-32"
       style={{ backgroundColor: 'var(--muted)' }}
     >
       <div className="max-w-6xl mx-auto">
-        <Reveal className="mb-14 max-w-2xl">
+        <Reveal className="mb-8 md:mb-14 max-w-2xl">
           <h2
             className="font-semibold"
             style={{
@@ -56,7 +56,7 @@ export function LibrarySection({
                 direction={i % 2 === 0 ? 'left' : 'right'}
               >
                 <SpotlightCard
-                  className="h-full rounded-lg p-6"
+                  className="h-full rounded-lg p-5 md:p-6"
                   style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}
                 >
                   <div

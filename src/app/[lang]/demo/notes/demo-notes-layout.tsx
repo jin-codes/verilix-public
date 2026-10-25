@@ -6,7 +6,8 @@ import DocumentFilterBar from '@/components/notes/document-filter-bar'
 import DocumentRowList from '@/components/notes/document-row-list'
 import type { DocumentSummary, TagNode } from '@/components/notes/use-document-browser'
 import LogoLockup from '@/components/layout/logo-lockup'
-import { DEMO_CATEGORIES, DEMO_DOCUMENTS } from '@/lib/demo/notes-data'
+import { getDemoData } from '@/lib/demo/get-demo-data'
+import type { DemoDocument } from '@/lib/demo/notes-data'
 import { useIsMobile } from '@/lib/use-is-mobile'
 import DemoModeTabs from './demo-mode-tabs'
 import DemoSidebarFooter from './demo-sidebar-footer'
@@ -16,15 +17,11 @@ interface DemoNotesLayoutProps {
   lang: string
 }
 
-const SORTED_DOCUMENTS = [...DEMO_DOCUMENTS].sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
-
-const TAG_NODES: TagNode[] = DEMO_CATEGORIES.map((c) => ({ id: c.id, name: c.name }))
-
-function toSummary(d: (typeof DEMO_DOCUMENTS)[number]): DocumentSummary {
+function toSummary(d: DemoDocument): DocumentSummary {
   return { id: d.id, title: d.title, updated_at: d.updatedAt, doc_type: d.docType, tag_node_id: d.categoryId }
 }
 
-function matchesQuery(doc: (typeof DEMO_DOCUMENTS)[number], q: string) {
+function matchesQuery(doc: DemoDocument, q: string) {
   const needle = q.toLowerCase()
   return (
     doc.title.toLowerCase().includes(needle) ||
@@ -45,11 +42,19 @@ export default function DemoNotesLayout({ lang }: DemoNotesLayoutProps) {
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null)
   const isMobile = useIsMobile()
 
+  const { sortedDocuments, tagNodes } = useMemo(() => {
+    const data = getDemoData(lang)
+    return {
+      sortedDocuments: [...data.documents].sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)),
+      tagNodes: data.categories.map((c): TagNode => ({ id: c.id, name: c.name })),
+    }
+  }, [lang])
+
   const listToRender = useMemo(() => {
-    const base = searchQuery ? SORTED_DOCUMENTS.filter((d) => matchesQuery(d, searchQuery)) : SORTED_DOCUMENTS
+    const base = searchQuery ? sortedDocuments.filter((d) => matchesQuery(d, searchQuery)) : sortedDocuments
     const filtered = selectedTagId ? base.filter((d) => d.categoryId === selectedTagId) : base
     return filtered.map(toSummary)
-  }, [searchQuery, selectedTagId])
+  }, [sortedDocuments, searchQuery, selectedTagId])
 
   const emptyMessage =
     searchQuery !== null
@@ -78,7 +83,7 @@ export default function DemoNotesLayout({ lang }: DemoNotesLayoutProps) {
       setQuery={setQuery}
       onSubmit={handleSearchSubmit}
       onClear={handleClearSearch}
-      tagNodes={TAG_NODES}
+      tagNodes={tagNodes}
       selectedTagId={selectedTagId}
       setSelectedTagId={setSelectedTagId}
     />

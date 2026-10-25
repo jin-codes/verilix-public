@@ -11,6 +11,7 @@ export function registerListCategoriesTool(server: McpServer) {
     'list_categories',
     {
       title: 'List Categories',
+      annotations: { readOnlyHint: true },
       description:
         "List the user's top-level knowledge-base categories with how many documents sit in each. Use it before moving a document to a category (edit_document) or renaming/merging categories (manage_category).",
       inputSchema: {},

@@ -8,6 +8,7 @@ export function registerDeleteDocumentTool(server: McpServer) {
     'delete_document',
     {
       title: 'Delete Document',
+      annotations: { readOnlyHint: false, destructiveHint: true },
       description:
         "Move a document to the trash in the user's verilix knowledge base. The data is kept, not erased — it stops showing up in list_documents / search_knowledge but can be brought back with restore_document, and its full history stays in document_history. Pass `message` to note why. Only delete when the user clearly asked to.",
       inputSchema: {

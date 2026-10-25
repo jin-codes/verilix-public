@@ -24,7 +24,6 @@
       "subtitle": "Connect the AI tools you already use to verilix. Your conversations get distilled into structured notes that build up — and only what's relevant flows into the next one.",
       "cta": "Connect for free",
       "ctaSecondary": "MCP connection · no cost",
-      "freeNote": "No card required. Start in a minute.",
       "scrollHint": "Scroll"
     },
     "loop": {
@@ -176,8 +175,7 @@
       "note": "There's no charge for the MCP connection."
     },
     "footer": {
-      "tagline": "Your own AI knowledge partner, growing deeper with every conversation",
-      "copyright": "© {year} verilix"
+      "tagline": "Your own AI knowledge partner, growing deeper with every conversation"
     }
   }
 }

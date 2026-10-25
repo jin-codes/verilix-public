@@ -18,6 +18,7 @@ export function registerListDocumentsTool(server: McpServer) {
     'list_documents',
     {
       title: 'List Documents',
+      annotations: { readOnlyHint: true },
       description:
         "List every document in the user's verilix knowledge base, most recently updated first. Unlike search_knowledge this does not rank by relevance — it returns the whole library, page by page. Use it to browse or to find a document's id before calling edit_document.",
       inputSchema: {
