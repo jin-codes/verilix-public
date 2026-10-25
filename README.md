@@ -9,7 +9,9 @@
 **Live site**: https://verilix.vercel.app · **Demo (fictional data)**: https://verilix.vercel.app/en/demo/notes
 
 ## Demo video
-32-second walkthrough (no audio): [English](docs/demo/verilix-demo-en.mp4) · [한국어](docs/demo/verilix-demo-ko.mp4)
+![verilix demo — connect an AI, auto-organize into documents, browse the knowledge map](docs/demo/verilix-demo-en.gif)
+
+32-second walkthrough, no audio. Full quality: [English (mp4)](docs/demo/verilix-demo-en.mp4) · [한국어 (mp4)](docs/demo/verilix-demo-ko.mp4)
 
 ## Screenshots
 ![Landing page — hero with a knowledge graph that reacts to the mouse](docs/screenshots/landing-hero.webp)
